@@ -1,0 +1,153 @@
+/* =========================================
+   ABOUT SECTION STYLES
+   ========================================= */
+.about {
+  position: relative;
+  width: 100%;
+  height: 200vh;
+  background: #E8E4E0;
+  overflow: visible;
+}
+
+/* Sticky container */
+.about-sticky-container {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  padding-top: 6vh;
+}
+
+/* Text Content */
+.about-text-content {
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+  pointer-events: none;
+  margin-bottom: 2rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.section-tag {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: #666;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.about-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.about-title span {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  color: #1A1A1A;
+  letter-spacing: 0.02em;
+  text-align: center;
+  display: block;
+}
+
+/* Image Container */
+.about-image-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(0);
+  overflow: hidden;
+  will-change: width, height, top;
+  z-index: 5;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.about-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Description */
+.about-description {
+  position: absolute;
+  bottom: 8vh;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  padding: 0 2rem;
+  z-index: 10;
+  pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.about-description p {
+  max-width: 600px;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.8;
+  color: #555;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .about-sticky-container {
+    padding-top: 5vh;
+  }
+  
+  .about-title span {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+  }
+  
+  .about-description {
+    bottom: 5vh;
+  }
+  
+  .about-description p {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-sticky-container {
+    padding-top: 4vh;
+  }
+  
+  .section-tag {
+    font-size: 0.6rem;
+  }
+  
+  .about-title span {
+    font-size: clamp(1.8rem, 12vw, 2.5rem);
+  }
+  
+  .about-description {
+    bottom: 3vh;
+    padding: 0 1.5rem;
+  }
+}

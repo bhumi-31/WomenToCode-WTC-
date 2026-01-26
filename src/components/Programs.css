@@ -1,0 +1,325 @@
+/* =========================================
+   PROGRAMS SECTION STYLES
+   ========================================= */
+.programs {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: #0A0A0A;
+  padding: 6rem 0;
+  overflow: hidden;
+  perspective: 1000px;
+  perspective-origin: center center;
+}
+
+.programs-container {
+  width: 100%;
+  transform-style: preserve-3d;
+}
+
+/* Programs Header - 3D Effect */
+.programs-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 0 4rem;
+  opacity: 0;
+  transform: translateZ(-200px) rotateX(15deg) translateY(40px);
+  transform-style: preserve-3d;
+  transition: none;
+}
+
+.programs-header.animate-in {
+  animation: heading3DIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.programs-header .section-tag {
+  color: rgba(255, 255, 255, 0.5);
+  display: block;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+.programs-header:not(.animate-in) .section-tag {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes heading3DIn {
+  0% {
+    opacity: 0;
+    transform: translateZ(-200px) rotateX(15deg) translateY(40px);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+    transform: translateZ(0) rotateX(0) translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.programs-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-style: preserve-3d;
+}
+
+.programs-title span {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 400;
+  line-height: 0.95;
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+  display: block;
+  opacity: 0;
+  transform: translateZ(-100px) translateY(30px);
+}
+
+.programs-header.animate-in .programs-title span:nth-child(1) {
+  animation: titleWord3D 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+}
+
+.programs-header.animate-in .programs-title span:nth-child(2) {
+  animation: titleWord3D 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+}
+
+@keyframes titleWord3D {
+  0% {
+    opacity: 0;
+    transform: translateZ(-100px) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateZ(0) translateY(0);
+  }
+}
+
+/* Horizontal Scroll Container */
+.programs-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  cursor: grab;
+  padding: 2rem 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.programs-scroll-container.animate-in {
+  animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+}
+
+.programs-scroll-container:not(.animate-in) {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.programs-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.programs-scroll-container:active {
+  cursor: grabbing;
+}
+
+.programs-track {
+  display: flex;
+  gap: 2rem;
+  padding: 0 4rem;
+  width: max-content;
+}
+
+/* Program Card */
+.program-card {
+  flex-shrink: 0;
+  width: 350px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.4s ease,
+              box-shadow 0.4s ease;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateZ(-80px) translateY(60px) rotateX(10deg);
+  transform-style: preserve-3d;
+}
+
+.program-card.animate-in {
+  animation: card3DPopIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.program-card:not(.animate-in) {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes card3DPopIn {
+  0% {
+    opacity: 0;
+    transform: translateZ(-80px) translateY(60px) rotateX(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateZ(0) translateY(0) rotateX(0);
+  }
+}
+
+.program-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.15);
+}
+
+.program-image-wrapper {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.program-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.program-card:hover .program-image {
+  transform: scale(1.1);
+}
+
+.program-content {
+  padding: 1.5rem;
+}
+
+.program-name {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.program-name span {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+}
+
+.program-description {
+  font-size: 0.85rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1.5rem;
+}
+
+.program-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.program-link:hover {
+  gap: 0.75rem;
+}
+
+.program-link svg {
+  transition: transform 0.3s ease;
+}
+
+.program-link:hover svg {
+  transform: translateX(4px);
+}
+
+/* Programs Hint */
+.programs-hint {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.programs-hint span {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .programs {
+    padding: 4rem 0;
+  }
+  
+  .programs-header {
+    padding: 0 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .programs-title span {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+  }
+  
+  .programs-track {
+    padding: 0 2rem;
+    gap: 1.5rem;
+  }
+  
+  .program-card {
+    width: 300px;
+  }
+  
+  .program-image-wrapper {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .programs-track {
+    padding: 0 1.5rem;
+  }
+  
+  .program-card {
+    width: 280px;
+  }
+  
+  .program-name span {
+    font-size: 1.5rem;
+  }
+}
