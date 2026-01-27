@@ -11,6 +11,10 @@
   --color-white: #ffffff;
   --color-accent: #F7D046;
   --color-accent-hover: #fae17a;
+  --color-secondary: #722F37;
+  --color-secondary-light: #8B3A44;
+  --color-cream: #FAF7F2;
+  --color-slate: #4A5568;
   --color-purple: #8B5CF6;
   --color-pink: #EC4899;
   --color-gray: rgba(255, 255, 255, 0.7);
@@ -62,12 +66,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-purple);
+  background: #F7D046;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-pink);
+  background: #fae17a;
 }
 
 /* =========================================

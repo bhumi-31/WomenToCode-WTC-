@@ -3,10 +3,19 @@ import './App.css'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import About from './components/About'
-import Programs from './components/Programs'
+import WhatWeOffer from './components/WhatWeOffer'
+import EventsPreview from './components/EventsPreview'
+import JoinCTA from './components/JoinCTA'
+import Footer from './components/Footer'
+import Events from './components/Events'
 import Team from './components/Team'
 import TeamMember from './components/TeamMember'
 import Contact from './components/Contact'
+import Projects from './components/Projects'
+import Gallery from './components/Gallery'
+import Articles from './components/Articles'
+import Login from './components/Login'
+import Signup from './components/Signup'
 
 // Home page component
 function HomePage() {
@@ -15,7 +24,10 @@ function HomePage() {
       <Navbar />
       <Hero />
       <About />
-      <Programs />
+      <WhatWeOffer />
+      <EventsPreview />
+      <JoinCTA />
+      <Footer />
     </>
   )
 }
@@ -25,9 +37,15 @@ function App() {
     <div className="app">
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/events" element={<Events />} />
         <Route path="/team" element={<Team />} />
         <Route path="/team/:memberId" element={<TeamMember />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/articles" element={<Articles />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </div>
   )

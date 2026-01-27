@@ -28,18 +28,25 @@ function Navbar() {
         <a href="#join" className="nav-register-btn">
           <span>✦</span> JOIN NOW
         </a>
+
+        <Link to="/login" className="nav-login-btn">
+          LOGIN
+        </Link>
         
         <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
           {isHomePage ? (
             <>
               <a href="#home" onClick={() => setMenuOpen(false)}>HOME</a>
               <a href="#about" onClick={() => setMenuOpen(false)}>ABOUT</a>
-              <a href="#programs" onClick={() => setMenuOpen(false)}>PROGRAMS</a>
             </>
           ) : (
             <Link to="/" onClick={() => setMenuOpen(false)}>HOME</Link>
           )}
+          <Link to="/events" onClick={() => setMenuOpen(false)}>EVENTS</Link>
           <Link to="/team" onClick={() => setMenuOpen(false)}>TEAM</Link>
+          <Link to="/projects" onClick={() => setMenuOpen(false)}>PROJECTS</Link>
+          <Link to="/gallery" onClick={() => setMenuOpen(false)}>GALLERY</Link>
+          <Link to="/articles" onClick={() => setMenuOpen(false)}>ARTICLES</Link>
           <Link to="/contact" onClick={() => setMenuOpen(false)}>CONTACT</Link>
         </div>
 

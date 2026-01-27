@@ -61,10 +61,10 @@ img, video {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #F7D046;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #fae17a;
 }

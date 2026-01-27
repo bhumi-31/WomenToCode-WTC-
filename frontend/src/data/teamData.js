@@ -1,178 +1,210 @@
-// Team Members Data
+// Team Members Data - 17 Members
 // Replace placeholder images with real team photos
 
 export const teamMembers = [
   {
     id: 'sarah-johnson',
+    firstName: 'Sarah',
+    lastName: 'Johnson',
     name: 'Sarah Johnson',
     role: 'Founder & CEO',
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop',
-    quote: 'Empowering women to break barriers in technology, one line of code at a time.',
-    bio: `Sarah Johnson is the visionary founder of WomenToCode, a platform dedicated to empowering women in technology. With over 15 years of experience in software development and tech leadership, she has been instrumental in creating inclusive spaces for women to learn, grow, and thrive in the tech industry.
-
-Her journey began as a self-taught developer, facing numerous challenges in a male-dominated field. These experiences fueled her passion to create opportunities for other women facing similar obstacles. Under her leadership, WomenToCode has trained over 5,000 women in programming and helped hundreds land their dream jobs in tech.`,
-    skills: ['Leadership', 'Python', 'Strategic Planning', 'Public Speaking', 'Mentorship'],
-    achievements: [
-      { icon: '🏆', title: 'Tech Leader of the Year', subtitle: '2024' },
-      { icon: '👩‍💻', title: '5000+ Women Trained', subtitle: 'Since 2020' },
-      { icon: '🎤', title: 'TEDx Speaker', subtitle: '2023' }
-    ],
-    social: {
-      twitter: 'https://twitter.com',
-      linkedin: 'https://linkedin.com',
-      instagram: 'https://instagram.com',
-      email: 'sarah@womentocode.com'
-    }
+    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=800&fit=crop',
+    color: '#F7D046', // Yellow
+    stats: { womenTrained: '5000+', eventsHosted: '150+', yearsExp: '15+' },
+    quote: 'Empowering women to break barriers in technology.',
+    social: { linkedin: 'https://linkedin.com', twitter: 'https://twitter.com' }
   },
   {
     id: 'priya-sharma',
+    firstName: 'Priya',
+    lastName: 'Sharma',
     name: 'Priya Sharma',
     role: 'Technical Director',
-    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop',
+    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=800&fit=crop',
+    color: '#E8505B', // Coral Red
+    stats: { coursesCreated: '50+', yearsExp: '12+', projectsLed: '100+' },
     quote: 'Code is poetry, and every woman deserves to write her own verses.',
-    bio: `Priya Sharma leads the technical curriculum and development at WomenToCode. A former Google engineer with expertise in full-stack development, she brings real-world industry experience to the classroom.
-
-She specializes in making complex technical concepts accessible to beginners while ensuring advanced students are challenged. Priya has designed over 50 courses and workshops that have helped thousands of women transition into tech careers.`,
-    skills: ['React', 'Node.js', 'Python', 'System Design', 'AWS'],
-    achievements: [
-      { icon: '📚', title: '50+ Courses Created', subtitle: 'Online & Offline' },
-      { icon: '🌟', title: 'Ex-Google Engineer', subtitle: '8 Years' },
-      { icon: '💻', title: 'Open Source Contributor', subtitle: '200+ PRs' }
-    ],
-    social: {
-      twitter: 'https://twitter.com',
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      email: 'priya@womentocode.com'
-    }
+    social: { linkedin: 'https://linkedin.com', github: 'https://github.com' }
   },
   {
     id: 'maya-patel',
+    firstName: 'Maya',
+    lastName: 'Patel',
     name: 'Maya Patel',
     role: 'Community Lead',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop',
-    quote: 'Building bridges between aspiration and achievement through community.',
-    bio: `Maya Patel is the heart of the WomenToCode community. She manages partnerships, events, and ensures every member feels welcomed and supported in their learning journey.
-
-With a background in community building and event management, Maya has organized over 100 tech events, hackathons, and networking sessions. She believes in the power of community to transform individual journeys into collective success stories.`,
-    skills: ['Community Building', 'Event Management', 'Partnership Development', 'Social Media', 'Content Strategy'],
-    achievements: [
-      { icon: '🎉', title: '100+ Events Organized', subtitle: 'Workshops & Hackathons' },
-      { icon: '🤝', title: '50+ Corporate Partners', subtitle: 'Industry Connections' },
-      { icon: '❤️', title: '10K+ Community Members', subtitle: 'Growing Strong' }
-    ],
-    social: {
-      twitter: 'https://twitter.com',
-      linkedin: 'https://linkedin.com',
-      instagram: 'https://instagram.com',
-      email: 'maya@womentocode.com'
-    }
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=800&fit=crop',
+    color: '#14B8A6', // Teal
+    stats: { eventsOrganized: '100+', communitySize: '10K+', partnersOnboarded: '50+' },
+    quote: 'Building bridges between aspiration and achievement.',
+    social: { linkedin: 'https://linkedin.com', instagram: 'https://instagram.com' }
   },
   {
     id: 'ananya-gupta',
+    firstName: 'Ananya',
+    lastName: 'Gupta',
     name: 'Ananya Gupta',
     role: 'Lead Instructor',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop',
-    quote: 'Every expert was once a beginner. I help women take that first step.',
-    bio: `Ananya Gupta is the Lead Instructor at WomenToCode, specializing in web development and UI/UX design. Her patient teaching style and ability to break down complex concepts have made her a favorite among students.
-
-Before joining WomenToCode, Ananya worked as a senior frontend developer at multiple startups. She combines her industry experience with a passion for teaching to create practical, job-ready curricula.`,
-    skills: ['JavaScript', 'React', 'CSS/SASS', 'Figma', 'UI/UX Design'],
-    achievements: [
-      { icon: '⭐', title: '4.9/5 Rating', subtitle: 'Student Reviews' },
-      { icon: '🎓', title: '2000+ Students Taught', subtitle: 'Career Transformations' },
-      { icon: '🏅', title: 'Best Instructor Award', subtitle: '2023 & 2024' }
-    ],
-    social: {
-      twitter: 'https://twitter.com',
-      linkedin: 'https://linkedin.com',
-      dribbble: 'https://dribbble.com',
-      email: 'ananya@womentocode.com'
-    }
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&h=800&fit=crop',
+    color: '#8B5CF6', // Purple
+    stats: { studentsTaught: '2000+', rating: '4.9/5', coursesDelivered: '80+' },
+    quote: 'Every expert was once a beginner.',
+    social: { linkedin: 'https://linkedin.com', dribbble: 'https://dribbble.com' }
   },
   {
     id: 'riya-singh',
+    firstName: 'Riya',
+    lastName: 'Singh',
     name: 'Riya Singh',
     role: 'Career Counselor',
-    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop',
-    quote: 'Your dream job in tech is not just possible—it is inevitable with the right guidance.',
-    bio: `Riya Singh helps WomenToCode graduates navigate the job market and land their dream roles. With a background in HR and recruitment at top tech companies, she understands exactly what employers are looking for.
-
-She conducts resume reviews, mock interviews, and career planning sessions that have helped hundreds of women successfully transition into tech careers with top companies.`,
-    skills: ['Career Coaching', 'Resume Building', 'Interview Prep', 'Salary Negotiation', 'LinkedIn Optimization'],
-    achievements: [
-      { icon: '💼', title: '500+ Job Placements', subtitle: 'Success Stories' },
-      { icon: '📈', title: '40% Avg Salary Increase', subtitle: 'For Career Switchers' },
-      { icon: '🏢', title: 'FAANG Placements', subtitle: 'Google, Amazon, Meta' }
-    ],
-    social: {
-      twitter: 'https://twitter.com',
-      linkedin: 'https://linkedin.com',
-      email: 'riya@womentocode.com'
-    }
+    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&h=800&fit=crop',
+    color: '#F59E0B', // Amber
+    stats: { jobPlacements: '500+', salaryIncrease: '40%', faangPlacements: '50+' },
+    quote: 'Your dream job in tech is not just possible—it is inevitable.',
+    social: { linkedin: 'https://linkedin.com', twitter: 'https://twitter.com' }
   },
   {
     id: 'neha-verma',
+    firstName: 'Neha',
+    lastName: 'Verma',
     name: 'Neha Verma',
     role: 'Content Creator',
-    image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=500&fit=crop',
-    quote: 'Making tech education accessible, engaging, and fun for everyone.',
-    bio: `Neha Verma leads content creation at WomenToCode, producing educational videos, blog posts, and social media content that reaches millions of aspiring women developers worldwide.
-
-Her creative approach to explaining programming concepts has made WomenToCode's content viral multiple times. She believes in making tech education not just accessible but genuinely enjoyable.`,
-    skills: ['Video Production', 'Technical Writing', 'Social Media', 'Graphic Design', 'SEO'],
-    achievements: [
-      { icon: '📱', title: '1M+ Social Followers', subtitle: 'Across Platforms' },
-      { icon: '🎬', title: '500+ Videos Created', subtitle: 'YouTube & Instagram' },
-      { icon: '✍️', title: '200+ Blog Articles', subtitle: 'Tech Tutorials' }
-    ],
-    social: {
-      twitter: 'https://twitter.com',
-      youtube: 'https://youtube.com',
-      instagram: 'https://instagram.com',
-      email: 'neha@womentocode.com'
-    }
+    image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&h=800&fit=crop',
+    color: '#EC4899', // Pink
+    stats: { followers: '1M+', videosCreated: '500+', articlesWritten: '200+' },
+    quote: 'Making tech education accessible and fun.',
+    social: { youtube: 'https://youtube.com', instagram: 'https://instagram.com' }
   },
   {
     id: 'kavya-joshi',
+    firstName: 'Kavya',
+    lastName: 'Joshi',
     name: 'Kavya Joshi',
     role: 'Operations Manager',
-    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=500&fit=crop',
-    quote: 'Behind every successful program is seamless operations and endless coffee.',
-    bio: `Kavya Joshi ensures everything runs smoothly at WomenToCode. From coordinating schedules to managing resources, she is the backbone that keeps the organization functioning efficiently.
-
-Her attention to detail and organizational skills have been crucial in scaling WomenToCode from a small initiative to a nationwide movement empowering thousands of women.`,
-    skills: ['Project Management', 'Operations', 'Budgeting', 'Team Coordination', 'Process Optimization'],
-    achievements: [
-      { icon: '📊', title: 'Scaled 10x Operations', subtitle: 'In 2 Years' },
-      { icon: '⚡', title: '99% Program Completion', subtitle: 'Delivery Rate' },
-      { icon: '🔄', title: 'Streamlined 50+ Processes', subtitle: 'Efficiency Expert' }
-    ],
-    social: {
-      linkedin: 'https://linkedin.com',
-      email: 'kavya@womentocode.com'
-    }
+    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=600&h=800&fit=crop',
+    color: '#06B6D4', // Cyan
+    stats: { processesOptimized: '50+', scaledOps: '10x', completionRate: '99%' },
+    quote: 'Behind every successful program is seamless operations.',
+    social: { linkedin: 'https://linkedin.com' }
   },
   {
     id: 'aisha-khan',
+    firstName: 'Aisha',
+    lastName: 'Khan',
     name: 'Aisha Khan',
     role: 'Partnerships Lead',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop',
-    quote: 'Creating opportunities through meaningful industry connections.',
-    bio: `Aisha Khan builds bridges between WomenToCode and the tech industry. She manages corporate partnerships, sponsorships, and collaborations that create real opportunities for community members.
-
-Her network spans across startups to Fortune 500 companies, and she has been instrumental in creating internship and job pipelines for WomenToCode graduates.`,
-    skills: ['Business Development', 'Negotiation', 'Networking', 'Sponsorship Management', 'Strategic Partnerships'],
-    achievements: [
-      { icon: '🤝', title: '100+ Partnerships', subtitle: 'Industry Leaders' },
-      { icon: '💰', title: '$2M+ in Scholarships', subtitle: 'Secured for Students' },
-      { icon: '🌐', title: 'Global Network', subtitle: '20+ Countries' }
-    ],
-    social: {
-      twitter: 'https://twitter.com',
-      linkedin: 'https://linkedin.com',
-      email: 'aisha@womentocode.com'
-    }
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=800&fit=crop',
+    color: '#10B981', // Emerald
+    stats: { partnerships: '100+', scholarshipValue: '$2M+', countriesReached: '20+' },
+    quote: 'Creating opportunities through meaningful connections.',
+    social: { linkedin: 'https://linkedin.com', twitter: 'https://twitter.com' }
+  },
+  {
+    id: 'divya-nair',
+    firstName: 'Divya',
+    lastName: 'Nair',
+    name: 'Divya Nair',
+    role: 'Data Science Instructor',
+    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&h=800&fit=crop',
+    color: '#6366F1', // Indigo
+    stats: { modelsTrained: '200+', workshopsLed: '75+', certifications: '15+' },
+    quote: 'Data tells stories, let me teach you to listen.',
+    social: { linkedin: 'https://linkedin.com', github: 'https://github.com' }
+  },
+  {
+    id: 'sneha-reddy',
+    firstName: 'Sneha',
+    lastName: 'Reddy',
+    name: 'Sneha Reddy',
+    role: 'UI/UX Designer',
+    image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&h=800&fit=crop',
+    color: '#F43F5E', // Rose
+    stats: { designsShipped: '150+', brandsBuilt: '40+', awards: '12' },
+    quote: 'Good design is invisible, great design is unforgettable.',
+    social: { linkedin: 'https://linkedin.com', dribbble: 'https://dribbble.com' }
+  },
+  {
+    id: 'pooja-mehta',
+    firstName: 'Pooja',
+    lastName: 'Mehta',
+    name: 'Pooja Mehta',
+    role: 'Cloud Architect',
+    image: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=600&h=800&fit=crop',
+    color: '#0EA5E9', // Sky Blue
+    stats: { infrastructuresBuilt: '80+', costSaved: '$1M+', certifications: '8' },
+    quote: 'Building scalable dreams on the cloud.',
+    social: { linkedin: 'https://linkedin.com', github: 'https://github.com' }
+  },
+  {
+    id: 'tanvi-chopra',
+    firstName: 'Tanvi',
+    lastName: 'Chopra',
+    name: 'Tanvi Chopra',
+    role: 'DevOps Engineer',
+    image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&h=800&fit=crop',
+    color: '#84CC16', // Lime
+    stats: { pipelinesBuilt: '120+', deployments: '1000+', uptime: '99.9%' },
+    quote: 'Automate everything, celebrate always.',
+    social: { linkedin: 'https://linkedin.com', github: 'https://github.com' }
+  },
+  {
+    id: 'ishita-das',
+    firstName: 'Ishita',
+    lastName: 'Das',
+    name: 'Ishita Das',
+    role: 'Mobile Dev Lead',
+    image: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=600&h=800&fit=crop',
+    color: '#A855F7', // Violet
+    stats: { appsLaunched: '25+', downloads: '2M+', rating: '4.8' },
+    quote: 'Building apps that fit in your pocket, change your life.',
+    social: { linkedin: 'https://linkedin.com', github: 'https://github.com' }
+  },
+  {
+    id: 'meera-krishnan',
+    firstName: 'Meera',
+    lastName: 'Krishnan',
+    name: 'Meera Krishnan',
+    role: 'Security Specialist',
+    image: 'https://images.unsplash.com/photo-1464863979621-258859e62245?w=600&h=800&fit=crop',
+    color: '#EF4444', // Red
+    stats: { vulnerabilitiesFixed: '500+', auditsCompleted: '100+', certified: '10+' },
+    quote: 'Security is not a product, but a process.',
+    social: { linkedin: 'https://linkedin.com', twitter: 'https://twitter.com' }
+  },
+  {
+    id: 'rashmi-iyer',
+    firstName: 'Rashmi',
+    lastName: 'Iyer',
+    name: 'Rashmi Iyer',
+    role: 'AI/ML Researcher',
+    image: 'https://images.unsplash.com/photo-1485875437342-9b39470b3d95?w=600&h=800&fit=crop',
+    color: '#22D3EE', // Cyan Light
+    stats: { papersPublished: '15+', modelsDeployed: '30+', patents: '3' },
+    quote: 'Teaching machines to learn, so humans can dream bigger.',
+    social: { linkedin: 'https://linkedin.com', github: 'https://github.com' }
+  },
+  {
+    id: 'kriti-agarwal',
+    firstName: 'Kriti',
+    lastName: 'Agarwal',
+    name: 'Kriti Agarwal',
+    role: 'Product Manager',
+    image: 'https://images.unsplash.com/photo-1479936343636-73cdc5aae0c3?w=600&h=800&fit=crop',
+    color: '#FBBF24', // Yellow Light
+    stats: { productsLaunched: '20+', usersImpacted: '500K+', teamSize: '50+' },
+    quote: 'Building products that users love and need.',
+    social: { linkedin: 'https://linkedin.com', twitter: 'https://twitter.com' }
+  },
+  {
+    id: 'swati-bhargava',
+    firstName: 'Swati',
+    lastName: 'Bhargava',
+    name: 'Swati Bhargava',
+    role: 'Marketing Head',
+    image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=600&h=800&fit=crop',
+    color: '#FB923C', // Orange
+    stats: { campaignsLed: '100+', reach: '5M+', conversionRate: '8%+' },
+    quote: 'Telling stories that inspire action.',
+    social: { linkedin: 'https://linkedin.com', instagram: 'https://instagram.com' }
   }
 ]
 

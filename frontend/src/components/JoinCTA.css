@@ -1,0 +1,213 @@
+/* =========================================
+   JOIN CTA SECTION
+   ========================================= */
+
+.join-cta-section {
+  background: var(--color-cream);
+  padding: 3rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.join-cta-container {
+  background: var(--color-dark);
+  border-radius: 24px;
+  padding: 6rem 4rem;
+  max-width: 100%;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(60px) scale(0.95);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.join-cta-container.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Subtle glow effect */
+.join-cta-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(247, 208, 70, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Tag */
+.join-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease 0.2s;
+}
+
+.join-cta-container.visible .join-tag {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Title */
+.join-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-white);
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.join-title .title-line {
+  display: block;
+  overflow: hidden;
+}
+
+.join-title .title-line:nth-child(2) {
+  color: var(--color-accent);
+}
+
+/* Character animation */
+.join-title .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(100%) rotateX(-80deg);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--char-index) * 0.03s + 0.3s);
+}
+
+.join-title .char.animate {
+  opacity: 1;
+  transform: translateY(0) rotateX(0deg);
+}
+
+/* Description */
+.join-description {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 650px;
+  margin: 0 auto 3rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease 0.6s;
+}
+
+.join-cta-container.visible .join-description {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* CTA Button */
+.join-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 2.5rem;
+  background: var(--color-accent);
+  color: var(--color-dark);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.join-cta-container.visible .join-btn {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease, opacity 0.6s ease 0.8s, transform 0.6s ease 0.8s;
+}
+
+.join-btn:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 50px rgba(247, 208, 70, 0.3);
+}
+
+.join-btn .btn-icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.join-btn:hover .btn-icon {
+  transform: rotate(90deg);
+}
+
+/* Social Link */
+.social-link {
+  display: inline-block;
+  margin-top: 3rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.join-cta-container.visible .social-link {
+  opacity: 1;
+  transition: all 0.3s ease, opacity 0.6s ease 1s;
+}
+
+.social-link:hover {
+  color: var(--color-white);
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 768px) {
+  .join-cta-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .join-cta-container {
+    padding: 4rem 2rem;
+    border-radius: 16px;
+  }
+
+  .join-title {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+  }
+
+  .join-description {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .join-cta-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .join-cta-container {
+    padding: 3rem 1.5rem;
+  }
+
+  .join-btn {
+    padding: 1rem 2rem;
+    font-size: 0.75rem;
+  }
+}
