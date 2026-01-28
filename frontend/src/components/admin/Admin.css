@@ -74,6 +74,17 @@
   letter-spacing: 0.02em;
 }
 
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 @keyframes slideInRight {
   from {
     transform: translateX(100%);
@@ -1246,6 +1257,7 @@
 
 .admin-page .team-card .member-info {
   flex: 1;
+  padding: 0.5rem 0;
 }
 
 .admin-page .team-card .member-name {
@@ -1253,12 +1265,22 @@
   font-size: 1.4rem;
   letter-spacing: 0.05em;
   margin: 0;
+  color: #FAF7F2;
+  display: block;
 }
 
 .admin-page .team-card .member-role {
-  color: var(--admin-accent);
+  color: #F7D046;
   font-size: 0.9rem;
   margin: 0.25rem 0;
+  display: block;
+}
+
+.admin-page .team-card .member-quote {
+  color: #888;
+  font-size: 0.85rem;
+  font-style: italic;
+  margin: 0.5rem 0;
 }
 
 .admin-page .team-card .member-bio {
@@ -1292,14 +1314,20 @@
    ADMIN EVENTS PAGE STYLES
    =========================================== */
 
-.admin-page .events-list {
+.admin-events {
+  padding: 2rem 0;
+}
+
+.admin-page .events-list,
+.admin-events .events-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   margin-top: 2rem;
 }
 
-.admin-page .event-card {
+.admin-page .event-card,
+.admin-events .event-card {
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
   padding: 1.5rem;
@@ -1309,13 +1337,15 @@
   align-items: center;
 }
 
-.admin-page .event-date-block {
+.admin-page .event-date-block,
+.admin-events .event-date-block {
   text-align: center;
   padding: 0.5rem;
   border: 1px solid var(--admin-border);
 }
 
-.admin-page .event-date-block .event-month {
+.admin-page .event-date-block .event-month,
+.admin-events .event-date-block .event-month {
   display: block;
   font-size: 0.8rem;
   color: var(--admin-accent);
@@ -1323,31 +1353,38 @@
   letter-spacing: 0.1em;
 }
 
-.admin-page .event-date-block .event-day {
+.admin-page .event-date-block .event-day,
+.admin-events .event-date-block .event-day {
   display: block;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 2rem;
+  color: var(--admin-text);
 }
 
-.admin-page .event-info {
+.admin-page .event-info,
+.admin-events .event-info {
   flex: 1;
 }
 
-.admin-page .event-info .event-header {
+.admin-page .event-info .event-header,
+.admin-events .event-info .event-header {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 0.5rem;
 }
 
-.admin-page .event-info .event-title {
+.admin-page .event-info .event-title,
+.admin-events .event-info .event-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.3rem;
   letter-spacing: 0.05em;
   margin: 0;
+  color: var(--admin-text);
 }
 
-.admin-page .event-info .event-type {
+.admin-page .event-info .event-type,
+.admin-events .event-info .event-type {
   background: var(--admin-border);
   padding: 0.2rem 0.6rem;
   font-size: 0.7rem;
@@ -1355,14 +1392,16 @@
   letter-spacing: 0.1em;
 }
 
-.admin-page .event-info .event-desc {
+.admin-page .event-info .event-desc,
+.admin-events .event-info .event-desc {
   color: var(--admin-muted);
   font-size: 0.85rem;
   margin: 0;
   line-height: 1.5;
 }
 
-.admin-page .event-info .event-meta {
+.admin-page .event-info .event-meta,
+.admin-events .event-info .event-meta {
   display: flex;
   gap: 1rem;
   margin-top: 0.75rem;
@@ -1370,13 +1409,15 @@
   color: var(--admin-muted);
 }
 
-.admin-page .event-status {
+.admin-page .event-status,
+.admin-events .event-status {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 0.9rem;
   letter-spacing: 0.1em;
 }
 
-.admin-page .event-actions {
+.admin-page .event-actions,
+.admin-events .event-actions {
   display: flex;
   gap: 0.5rem;
 }
@@ -1887,13 +1928,39 @@
 }
 
 .admin-page .modal-form .checkbox-group input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   width: 20px;
   height: 20px;
   min-width: 20px;
   padding: 0;
   cursor: pointer;
-  accent-color: #F7D046;
-  border-radius: 3px;
+  background: #1a1a1a;
+  border: 2px solid #444;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.admin-page .modal-form .checkbox-group input[type="checkbox"]:checked {
+  background: #F7D046;
+  border-color: #F7D046;
+}
+
+.admin-page .modal-form .checkbox-group input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #0a0a0a;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.admin-page .modal-form .checkbox-group input[type="checkbox"]:hover {
+  border-color: #F7D046;
 }
 
 .admin-page .modal-actions {

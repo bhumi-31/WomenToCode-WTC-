@@ -1,13 +1,70 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { eventsData } from '../data/eventsData'
+import { eventsData as fallbackEvents } from '../data/eventsData'
 import './EventsPreview.css'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
+// Helper function to transform API event data to match frontend format
+const transformEvent = (event) => {
+  // If event already has the new format fields, use them
+  if (event.date && event.month && event.speaker?.name) {
+    return event;
+  }
+  
+  // Transform from old backend format to frontend format
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  
+  let eventDate = event.startDate ? new Date(event.startDate) : new Date();
+  
+  return {
+    ...event,
+    id: event._id || event.id,
+    date: event.date || String(eventDate.getDate()).padStart(2, '0'),
+    month: event.month || months[eventDate.getMonth()],
+    year: event.year || String(eventDate.getFullYear()),
+    time: event.time || `${event.startTime || '10:00 AM'} - ${event.endTime || '12:00 PM'}`,
+    location: event.location || event.venue || (event.isOnline ? 'Online' : 'TBA'),
+    type: event.type || (event.eventType ? event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1) : 'Workshop'),
+    speaker: event.speaker?.name ? event.speaker : {
+      name: event.speakers?.[0]?.name || 'TBA',
+      role: event.speakers?.[0]?.title || '',
+      image: event.speakers?.[0]?.image || event.speaker?.image || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face'
+    },
+    registrationLink: event.registrationLink || '#'
+  };
+};
 
 function EventsPreview() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [events, setEvents] = useState(fallbackEvents)
   const sectionRef = useRef(null)
+
+  // Fetch events from API
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch(`${API_URL}/events`);
+        const data = await response.json();
+        
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const transformedEvents = data.data.map(transformEvent);
+          setEvents(transformedEvents);
+        } else if (Array.isArray(data) && data.length > 0) {
+          const transformedEvents = data.map(transformEvent);
+          setEvents(transformedEvents);
+        }
+        // Keep fallback if no events
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        // Keep fallback events on error
+      }
+    };
+    
+    fetchEvents();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -29,14 +86,14 @@ function EventsPreview() {
   const handlePrev = () => {
     if (isAnimating) return
     setIsAnimating(true)
-    setActiveIndex(prev => (prev === 0 ? eventsData.length - 1 : prev - 1))
+    setActiveIndex(prev => (prev === 0 ? events.length - 1 : prev - 1))
     setTimeout(() => setIsAnimating(false), 500)
   }
 
   const handleNext = () => {
     if (isAnimating) return
     setIsAnimating(true)
-    setActiveIndex(prev => (prev === eventsData.length - 1 ? 0 : prev + 1))
+    setActiveIndex(prev => (prev === events.length - 1 ? 0 : prev + 1))
     setTimeout(() => setIsAnimating(false), 500)
   }
 
@@ -47,7 +104,9 @@ function EventsPreview() {
     setTimeout(() => setIsAnimating(false), 500)
   }
 
-  const activeEvent = eventsData[activeIndex]
+  const activeEvent = events[activeIndex] || events[0]
+
+  if (!activeEvent) return null;
 
   return (
     <section 
@@ -100,8 +159,8 @@ function EventsPreview() {
             {/* Speaker Image */}
             <div className={`speaker-image-wrapper ${isVisible ? 'animate-in' : ''}`}>
               <img 
-                src={activeEvent.speaker.image} 
-                alt={activeEvent.speaker.name}
+                src={activeEvent.speaker?.image || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face'} 
+                alt={activeEvent.speaker?.name || 'Speaker'}
                 className="speaker-image"
               />
               <div className="speaker-image-glow"></div>
@@ -110,8 +169,8 @@ function EventsPreview() {
             {/* Event Details */}
             <div className={`event-details ${isVisible ? 'animate-in' : ''}`}>
               <div className="speaker-info anim-item" style={{ '--item-index': 0 }}>
-                <h3 className="speaker-name">{activeEvent.speaker.name}</h3>
-                <p className="speaker-role">{activeEvent.speaker.role}</p>
+                <h3 className="speaker-name">{activeEvent.speaker?.name || 'TBA'}</h3>
+                <p className="speaker-role">{activeEvent.speaker?.role || ''}</p>
               </div>
 
               <div className="event-title-wrapper anim-item" style={{ '--item-index': 1 }}>
@@ -132,7 +191,7 @@ function EventsPreview() {
                 </div>
               </div>
 
-              <a href={activeEvent.registrationLink} className="register-btn anim-item" style={{ '--item-index': 4 }}>
+              <a href={activeEvent.registrationLink || '#'} className="register-btn anim-item" style={{ '--item-index': 4 }}>
                 <span className="btn-icon">✦</span>
                 <span>REGISTER NOW</span>
               </a>
@@ -142,9 +201,9 @@ function EventsPreview() {
 
         {/* Mini Date Cards */}
         <div className={`event-timeline ${isVisible ? 'animate-in' : ''}`}>
-          {eventsData.map((event, index) => (
+          {events.map((event, index) => (
             <button
-              key={event.id}
+              key={event._id || event.id}
               className={`timeline-item ${index === activeIndex ? 'active' : ''}`}
               onClick={() => handleDateClick(index)}
               style={{ '--timeline-index': index }}

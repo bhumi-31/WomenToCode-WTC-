@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const AdminEvents = () => {
   const [events, setEvents] = useState([]);
@@ -9,23 +9,32 @@ const AdminEvents = () => {
   const [editingEvent, setEditingEvent] = useState(null);
   const [filter, setFilter] = useState('all');
   const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null, title: '' });
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     shortDescription: '',
-    eventType: 'workshop',
-    startDate: '',
-    endDate: '',
+    type: 'Workshop',
+    fullDate: '',
+    date: '',
+    month: '',
+    year: '',
     startTime: '',
-    endTime: '',
+    time: '',
+    location: '',
     isOnline: false,
-    venue: '',
-    city: '',
-    registrationUrl: '',
+    speaker: {
+      name: '',
+      role: '',
+      image: ''
+    },
+    registrationLink: '',
     maxAttendees: '',
     image: '',
     status: 'upcoming'
   });
+
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
@@ -40,23 +49,32 @@ const AdminEvents = () => {
     const token = localStorage.getItem('token');
     
     try {
-      let response = await fetch(`${API_URL}/events/admin/all`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!response.ok) {
-        response = await fetch(`${API_URL}/events`);
-      }
-      
+      // Try public events endpoint first
+      const response = await fetch(`${API_URL}/events`);
       const data = await response.json();
       
+      console.log('Events API response:', data);
+      
       if (Array.isArray(data)) {
+        console.log('Setting events from array:', data.length);
         setEvents(data);
       } else if (data.success && Array.isArray(data.data)) {
-        setEvents(data.data);
+        // Map backend fields to frontend expected format
+        const mappedEvents = data.data.map(event => ({
+          ...event,
+          month: event.startDate ? new Date(event.startDate).toLocaleString('en', { month: 'short' }).toUpperCase() : event.month,
+          date: event.startDate ? new Date(event.startDate).getDate() : event.date,
+          year: event.startDate ? new Date(event.startDate).getFullYear() : event.year,
+          location: event.venue || event.location || (event.isOnline ? 'Online' : 'TBD'),
+          time: event.startTime || event.time
+        }));
+        console.log('Setting mapped events:', mappedEvents.length);
+        setEvents(mappedEvents);
       } else if (data.events) {
+        console.log('Setting events from data.events:', data.events.length);
         setEvents(data.events);
       } else {
+        console.log('No events found in response');
         setEvents([]);
       }
     } catch (error) {
@@ -101,8 +119,6 @@ const AdminEvents = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this event?')) return;
-    
     const token = localStorage.getItem('token');
     
     try {
@@ -120,7 +136,13 @@ const AdminEvents = () => {
     } catch (error) {
       console.error('Delete error:', error);
       showNotification('Error deleting event. Please try again.', 'error');
+    } finally {
+      setDeleteConfirm({ show: false, id: null, title: '' });
     }
+  };
+
+  const confirmDelete = (event) => {
+    setDeleteConfirm({ show: true, id: event._id, title: event.title });
   };
 
   const openAddModal = () => {
@@ -129,15 +151,21 @@ const AdminEvents = () => {
       title: '',
       description: '',
       shortDescription: '',
-      eventType: 'workshop',
-      startDate: '',
-      endDate: '',
+      type: 'Workshop',
+      fullDate: '',
+      date: '',
+      month: '',
+      year: new Date().getFullYear().toString(),
       startTime: '',
-      endTime: '',
+      time: '',
+      location: '',
       isOnline: false,
-      venue: '',
-      city: '',
-      registrationUrl: '',
+      speaker: {
+        name: '',
+        role: '',
+        image: ''
+      },
+      registrationLink: '#',
       maxAttendees: '',
       image: '',
       status: 'upcoming'
@@ -146,20 +174,35 @@ const AdminEvents = () => {
   };
 
   const openEditModal = (event) => {
+    // Create fullDate from existing date/month/year
+    let fullDate = '';
+    if (event.year && event.month && event.date) {
+      const monthIndex = months.indexOf(event.month);
+      if (monthIndex !== -1) {
+        fullDate = `${event.year}-${String(monthIndex + 1).padStart(2, '0')}-${String(event.date).padStart(2, '0')}`;
+      }
+    }
+    
     setEditingEvent(event);
     setFormData({
       title: event.title || '',
       description: event.description || '',
       shortDescription: event.shortDescription || '',
-      eventType: event.eventType || 'workshop',
-      startDate: event.startDate ? event.startDate.split('T')[0] : '',
-      endDate: event.endDate ? event.endDate.split('T')[0] : '',
+      type: event.type || 'Workshop',
+      fullDate: fullDate,
+      date: event.date || '',
+      month: event.month || '',
+      year: event.year || new Date().getFullYear().toString(),
       startTime: event.startTime || '',
-      endTime: event.endTime || '',
+      time: event.time || '',
+      location: event.location || '',
       isOnline: event.isOnline || false,
-      venue: event.venue || '',
-      city: event.city || '',
-      registrationUrl: event.registrationUrl || '',
+      speaker: {
+        name: event.speaker?.name || '',
+        role: event.speaker?.role || '',
+        image: event.speaker?.image || ''
+      },
+      registrationLink: event.registrationLink || '#',
       maxAttendees: event.maxAttendees || '',
       image: event.image || '',
       status: event.status || 'upcoming'
@@ -174,17 +217,10 @@ const AdminEvents = () => {
 
   const filteredEvents = events.filter(event => {
     if (filter === 'all') return true;
-    return event.status === filter || event.eventType === filter;
+    return event.status === filter || event.type === filter;
   });
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
+  console.log('Events state:', events.length, 'Filtered:', filteredEvents.length);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -205,7 +241,7 @@ const AdminEvents = () => {
   }
 
   return (
-    <div className="dashboard">
+    <div className="admin-events">
       {/* Notification */}
       {notification.show && (
         <div className={`admin-notification ${notification.type}`}>
@@ -229,7 +265,7 @@ const AdminEvents = () => {
 
       {/* Filters */}
       <div className="filter-tabs">
-        {['all', 'upcoming', 'ongoing', 'completed', 'workshop', 'webinar', 'meetup'].map(f => (
+        {['all', 'upcoming', 'ongoing', 'completed', 'Workshop', 'Talk', 'Hackathon'].map(f => (
           <button
             key={f}
             className={`filter-tab ${filter === f ? 'active' : ''}`}
@@ -241,40 +277,47 @@ const AdminEvents = () => {
       </div>
 
       {/* Events List */}
-      <div className="events-list">
-        {filteredEvents.length === 0 ? (
+      <div className="events-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '2rem' }}>
+        
+        {filteredEvents.map((event, index) => (
+          <div key={event._id || index} style={{
+            background: '#111111',
+            border: '2px solid #F7D046',
+            padding: '1.5rem',
+            display: 'grid',
+            gridTemplateColumns: '80px 1fr auto auto',
+            gap: '1.5rem',
+            alignItems: 'center',
+            minHeight: '100px'
+          }}>
+            <div style={{
+              textAlign: 'center',
+              padding: '0.5rem',
+              border: '1px solid #F7D046'
+            }}>
+              <span style={{ display: 'block', fontSize: '0.8rem', color: '#F7D046', textTransform: 'uppercase' }}>{event.month || 'TBD'}</span>
+              <span style={{ display: 'block', fontSize: '2rem', color: '#FAF7F2' }}>{event.date || '--'}</span>
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.3rem', margin: 0, color: '#FAF7F2' }}>{event.title}</h3>
+              <p style={{ color: '#888888', fontSize: '0.85rem', margin: '0.5rem 0' }}>{event.shortDescription || event.description?.substring(0, 100)}</p>
+              <span style={{ color: '#888', fontSize: '0.8rem' }}>📍 {event.location || event.venue || 'TBD'}</span>
+            </div>
+            <div style={{ color: '#F7D046' }}>
+              {event.status?.toUpperCase() || 'UPCOMING'}
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button onClick={() => openEditModal(event)} style={{ background: 'transparent', border: '1px solid #F7D046', color: '#F7D046', padding: '0.5rem 1rem', cursor: 'pointer' }}>Edit</button>
+              <button onClick={() => confirmDelete(event)} style={{ background: 'transparent', border: '1px solid #ff6b6b', color: '#ff6b6b', padding: '0.5rem 1rem', cursor: 'pointer' }}>Delete</button>
+            </div>
+          </div>
+        ))}
+        
+        {filteredEvents.length === 0 && (
           <div className="empty-state">
             <p>No events found</p>
             <button className="add-btn" onClick={openAddModal}>Create First Event</button>
           </div>
-        ) : (
-          filteredEvents.map(event => (
-            <div key={event._id} className="event-card">
-              <div className="event-date-block">
-                <span className="event-month">{formatDate(event.startDate).split(' ')[0]}</span>
-                <span className="event-day">{formatDate(event.startDate).split(' ')[1]?.replace(',', '')}</span>
-              </div>
-              <div className="event-info">
-                <div className="event-header">
-                  <h3 className="event-title">{event.title}</h3>
-                  <span className="event-type">{event.eventType}</span>
-                </div>
-                <p className="event-desc">{event.shortDescription || event.description?.substring(0, 100)}</p>
-                <div className="event-meta">
-                  <span>{event.isOnline ? '🌐 Online' : `📍 ${event.venue || event.city || 'TBD'}`}</span>
-                  {event.startTime && <span>🕐 {event.startTime}</span>}
-                  {event.maxAttendees && <span>👥 Max: {event.maxAttendees}</span>}
-                </div>
-              </div>
-              <div className="event-status" style={{ color: getStatusColor(event.status) }}>
-                {event.status?.toUpperCase() || 'UPCOMING'}
-              </div>
-              <div className="event-actions">
-                <button className="edit-btn" onClick={() => openEditModal(event)}>Edit</button>
-                <button className="delete-btn" onClick={() => handleDelete(event._id)}>Delete</button>
-              </div>
-            </div>
-          ))
         )}
       </div>
 
@@ -293,25 +336,27 @@ const AdminEvents = () => {
                   type="text"
                   value={formData.title}
                   onChange={e => setFormData({...formData, title: e.target.value})}
+                  placeholder="e.g., React & Node.js Masterclass"
                   required
                 />
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Event Type</label>
+                  <label>Event Type *</label>
                   <select
-                    value={formData.eventType}
-                    onChange={e => setFormData({...formData, eventType: e.target.value})}
+                    value={formData.type}
+                    onChange={e => setFormData({...formData, type: e.target.value})}
                   >
-                    <option value="workshop">Workshop</option>
-                    <option value="webinar">Webinar</option>
-                    <option value="meetup">Meetup</option>
-                    <option value="conference">Conference</option>
-                    <option value="hackathon">Hackathon</option>
-                    <option value="seminar">Seminar</option>
-                    <option value="networking">Networking</option>
-                    <option value="other">Other</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Talk">Talk</option>
+                    <option value="Hackathon">Hackathon</option>
+                    <option value="Webinar">Webinar</option>
+                    <option value="Meetup">Meetup</option>
+                    <option value="Conference">Conference</option>
+                    <option value="Seminar">Seminar</option>
+                    <option value="Networking">Networking</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -346,6 +391,7 @@ const AdminEvents = () => {
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
                   rows={4}
+                  placeholder="Detailed event description..."
                   required
                 />
               </div>
@@ -353,45 +399,59 @@ const AdminEvents = () => {
               <div className="form-section-title">Date & Time</div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Start Date *</label>
+                  <label>Event Date *</label>
                   <input
                     type="date"
-                    value={formData.startDate}
-                    onChange={e => setFormData({...formData, startDate: e.target.value})}
+                    value={formData.fullDate || ''}
+                    onChange={e => {
+                      const dateObj = new Date(e.target.value);
+                      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                      setFormData({
+                        ...formData,
+                        fullDate: e.target.value,
+                        date: dateObj.getDate().toString().padStart(2, '0'),
+                        month: months[dateObj.getMonth()],
+                        year: dateObj.getFullYear().toString()
+                      });
+                    }}
                     required
+                    style={{ colorScheme: 'dark' }}
                   />
                 </div>
                 <div className="form-group">
-                  <label>End Date</label>
+                  <label>Time *</label>
                   <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={e => setFormData({...formData, endDate: e.target.value})}
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Start Time</label>
-                  <input
-                    type="text"
-                    value={formData.startTime}
-                    onChange={e => setFormData({...formData, startTime: e.target.value})}
-                    placeholder="e.g., 10:00 AM"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>End Time</label>
-                  <input
-                    type="text"
-                    value={formData.endTime}
-                    onChange={e => setFormData({...formData, endTime: e.target.value})}
-                    placeholder="e.g., 4:00 PM"
+                    type="time"
+                    value={formData.startTime || ''}
+                    onChange={e => {
+                      const time24 = e.target.value;
+                      const [hours, minutes] = time24.split(':');
+                      const period = hours >= 12 ? 'PM' : 'AM';
+                      const hours12 = hours % 12 || 12;
+                      const formattedTime = `${hours12}:${minutes} ${period}`;
+                      setFormData({
+                        ...formData,
+                        startTime: e.target.value,
+                        time: formattedTime
+                      });
+                    }}
+                    required
+                    style={{ colorScheme: 'dark' }}
                   />
                 </div>
               </div>
 
               <div className="form-section-title">Location</div>
+              <div className="form-group">
+                <label>Location *</label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={e => setFormData({...formData, location: e.target.value})}
+                  placeholder="e.g., Online + LPU Campus, LPU Auditorium, Online"
+                  required
+                />
+              </div>
               <div className="form-group checkbox-group">
                 <label>
                   <input
@@ -402,36 +462,48 @@ const AdminEvents = () => {
                   This is an online event
                 </label>
               </div>
-              {!formData.isOnline && (
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Venue</label>
-                    <input
-                      type="text"
-                      value={formData.venue}
-                      onChange={e => setFormData({...formData, venue: e.target.value})}
-                      placeholder="Venue name"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>City</label>
-                    <input
-                      type="text"
-                      value={formData.city}
-                      onChange={e => setFormData({...formData, city: e.target.value})}
-                    />
-                  </div>
+
+              <div className="form-section-title">Speaker Info</div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Speaker Name *</label>
+                  <input
+                    type="text"
+                    value={formData.speaker.name}
+                    onChange={e => setFormData({...formData, speaker: {...formData.speaker, name: e.target.value}})}
+                    placeholder="e.g., Priya Sharma"
+                    required
+                  />
                 </div>
-              )}
+                <div className="form-group">
+                  <label>Speaker Role *</label>
+                  <input
+                    type="text"
+                    value={formData.speaker.role}
+                    onChange={e => setFormData({...formData, speaker: {...formData.speaker, role: e.target.value}})}
+                    placeholder="e.g., Tech Lead, Ex-Google"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Speaker Image URL</label>
+                <input
+                  type="text"
+                  value={formData.speaker.image}
+                  onChange={e => setFormData({...formData, speaker: {...formData.speaker, image: e.target.value}})}
+                  placeholder="https://images.unsplash.com/..."
+                />
+              </div>
 
               <div className="form-section-title">Additional Info</div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Registration URL</label>
+                  <label>Registration Link</label>
                   <input
                     type="text"
-                    value={formData.registrationUrl}
-                    onChange={e => setFormData({...formData, registrationUrl: e.target.value})}
+                    value={formData.registrationLink}
+                    onChange={e => setFormData({...formData, registrationLink: e.target.value})}
                     placeholder="https://..."
                   />
                 </div>
@@ -446,10 +518,10 @@ const AdminEvents = () => {
               </div>
 
               <div className="form-group">
-                <label>Event Image</label>
+                <label>Event Image (JPG, JPEG, PNG, PDF)</label>
                 <input
                   type="file"
-                  accept=".jpg,.jpeg,.png"
+                  accept=".jpg,.jpeg,.png,.pdf"
                   onChange={e => {
                     const file = e.target.files[0];
                     if (file) {
@@ -460,10 +532,16 @@ const AdminEvents = () => {
                       reader.readAsDataURL(file);
                     }
                   }}
+                  style={{ colorScheme: 'dark' }}
                 />
-                {formData.image && (
+                {formData.image && formData.image.startsWith('data:image') && (
                   <div className="image-preview">
                     <img src={formData.image} alt="Preview" />
+                  </div>
+                )}
+                {formData.image && formData.image.startsWith('data:application/pdf') && (
+                  <div style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(247, 208, 70, 0.1)', borderRadius: '8px' }}>
+                    <span style={{ color: '#F7D046' }}>PDF file selected</span>
                   </div>
                 )}
               </div>
@@ -475,6 +553,99 @@ const AdminEvents = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setDeleteConfirm({ show: false, id: null, title: '' })}
+        >
+          <div 
+            style={{
+              background: '#1a1a1a',
+              borderRadius: '12px',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '90%',
+              border: '1px solid #333',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'rgba(255, 107, 107, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+                border: '2px solid #ff6b6b'
+              }}>
+                <span style={{ fontSize: '1.8rem' }}>🗑️</span>
+              </div>
+              <h3 style={{ 
+                fontFamily: "'Bebas Neue', sans-serif", 
+                fontSize: '1.5rem', 
+                color: '#fff',
+                marginBottom: '0.5rem',
+                letterSpacing: '1px'
+              }}>
+                Delete Event?
+              </h3>
+              <p style={{ color: '#888', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                Are you sure you want to delete <strong style={{ color: '#F7D046' }}>"{deleteConfirm.title}"</strong>? This action cannot be undone.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                onClick={() => setDeleteConfirm({ show: false, id: null, title: '' })}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem 1.5rem',
+                  background: 'transparent',
+                  border: '1px solid #555',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleDelete(deleteConfirm.id)}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem 1.5rem',
+                  background: '#ff6b6b',
+                  border: 'none',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Yes, Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

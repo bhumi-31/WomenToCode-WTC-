@@ -336,16 +336,17 @@
 
 .input-icon {
   position: absolute;
-  left: 15px;
-  width: 20px;
-  height: 20px;
+  left: 14px;
+  width: 18px;
+  height: 18px;
   color: rgba(255, 255, 255, 0.4);
   pointer-events: none;
+  z-index: 1;
 }
 
 .input-wrapper input {
   width: 100%;
-  padding: 14px 45px 14px 50px;
+  padding: 14px 45px 14px 46px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -582,6 +583,183 @@
   opacity: 0.8;
 }
 
+/* Auth Callback Page */
+.auth-callback {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+.callback-container {
+  text-align: center;
+  padding: 60px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+}
+
+.callback-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.callback-icon.processing {
+  border: 3px solid rgba(247, 208, 70, 0.2);
+  border-top-color: var(--color-accent);
+}
+
+.callback-icon.success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 2px solid rgba(34, 197, 94, 0.3);
+}
+
+.callback-icon.success svg {
+  width: 40px;
+  height: 40px;
+  stroke: #22c55e;
+}
+
+.callback-icon.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.callback-icon.error svg {
+  width: 40px;
+  height: 40px;
+  stroke: #ef4444;
+}
+
+.callback-icon .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(247, 208, 70, 0.2);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.callback-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.callback-title.processing {
+  color: var(--color-accent);
+}
+
+.callback-title.success {
+  color: #22c55e;
+}
+
+.callback-title.error {
+  color: #ef4444;
+}
+
+.callback-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+}
+
+/* Success State */
+.success-state {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 25px;
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: #22c55e;
+}
+
+/* Error State */
+.error-state {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.error-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 25px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: #ef4444;
+}
+
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 60px 0;
+}
+
+.loading-state p {
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+}
+
+.loader.large {
+  width: 50px;
+  height: 50px;
+  border-width: 3px;
+}
+
+/* Secondary Button */
+.submit-btn.secondary {
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
+
+.submit-btn.secondary:hover {
+  background: rgba(247, 208, 70, 0.1);
+}
+
+/* Password Requirements */
+.password-requirements {
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.password-requirements p {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .auth-left {
@@ -614,5 +792,10 @@
 
   .form-title {
     font-size: 1.8rem;
+  }
+
+  .callback-container {
+    margin: 20px;
+    padding: 40px 30px;
   }
 }

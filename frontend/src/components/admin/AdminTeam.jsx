@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const AdminTeam = () => {
   const [members, setMembers] = useState([]);
@@ -8,16 +8,29 @@ const AdminTeam = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null, name: '' });
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     role: '',
     image: '',
-    bio: '',
-    socialLinks: {
+    color: '#F7D046',
+    quote: '',
+    stats: {
+      stat1Label: '',
+      stat1Value: '',
+      stat2Label: '',
+      stat2Value: '',
+      stat3Label: '',
+      stat3Value: ''
+    },
+    social: {
       linkedin: '',
       twitter: '',
       github: '',
-      instagram: ''
+      instagram: '',
+      youtube: '',
+      dribbble: ''
     },
     order: 0,
     isActive: true
@@ -58,6 +71,31 @@ const AdminTeam = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     
+    // Convert stats form format to object
+    const statsObject = {};
+    if (formData.stats.stat1Label && formData.stats.stat1Value) {
+      statsObject[formData.stats.stat1Label] = formData.stats.stat1Value;
+    }
+    if (formData.stats.stat2Label && formData.stats.stat2Value) {
+      statsObject[formData.stats.stat2Label] = formData.stats.stat2Value;
+    }
+    if (formData.stats.stat3Label && formData.stats.stat3Value) {
+      statsObject[formData.stats.stat3Label] = formData.stats.stat3Value;
+    }
+    
+    const submitData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      role: formData.role,
+      image: formData.image,
+      color: formData.color,
+      quote: formData.quote,
+      stats: statsObject,
+      social: formData.social,
+      order: formData.order,
+      isActive: formData.isActive
+    };
+    
     try {
       const url = editingMember 
         ? `${API_URL}/team/${editingMember._id}`
@@ -69,7 +107,7 @@ const AdminTeam = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
       
       const data = await response.json();
@@ -88,8 +126,6 @@ const AdminTeam = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this team member?')) return;
-    
     const token = localStorage.getItem('token');
     
     try {
@@ -107,17 +143,40 @@ const AdminTeam = () => {
     } catch (error) {
       console.error('Delete error:', error);
       showNotification('Error deleting member. Please try again.', 'error');
+    } finally {
+      setDeleteConfirm({ show: false, id: null, name: '' });
     }
+  };
+
+  const confirmDelete = (member) => {
+    setDeleteConfirm({ show: true, id: member._id, name: `${member.firstName} ${member.lastName}` });
   };
 
   const openAddModal = () => {
     setEditingMember(null);
     setFormData({
-      name: '',
+      firstName: '',
+      lastName: '',
       role: '',
       image: '',
-      bio: '',
-      socialLinks: { linkedin: '', twitter: '', github: '', instagram: '' },
+      color: '#F7D046',
+      quote: '',
+      stats: {
+        stat1Label: '',
+        stat1Value: '',
+        stat2Label: '',
+        stat2Value: '',
+        stat3Label: '',
+        stat3Value: ''
+      },
+      social: {
+        linkedin: '',
+        twitter: '',
+        github: '',
+        instagram: '',
+        youtube: '',
+        dribbble: ''
+      },
       order: members.length,
       isActive: true
     });
@@ -126,12 +185,33 @@ const AdminTeam = () => {
 
   const openEditModal = (member) => {
     setEditingMember(member);
+    // Convert stats Map to form format
+    const statsObj = member.stats || {};
+    const statsEntries = Object.entries(statsObj);
+    
     setFormData({
-      name: member.name || '',
+      firstName: member.firstName || member.name?.split(' ')[0] || '',
+      lastName: member.lastName || member.name?.split(' ').slice(1).join(' ') || '',
       role: member.role || '',
       image: member.image || '',
-      bio: member.bio || '',
-      socialLinks: member.socialLinks || { linkedin: '', twitter: '', github: '', instagram: '' },
+      color: member.color || '#F7D046',
+      quote: member.quote || '',
+      stats: {
+        stat1Label: statsEntries[0]?.[0] || '',
+        stat1Value: statsEntries[0]?.[1] || '',
+        stat2Label: statsEntries[1]?.[0] || '',
+        stat2Value: statsEntries[1]?.[1] || '',
+        stat3Label: statsEntries[2]?.[0] || '',
+        stat3Value: statsEntries[2]?.[1] || ''
+      },
+      social: member.social || member.socialLinks || {
+        linkedin: '',
+        twitter: '',
+        github: '',
+        instagram: '',
+        youtube: '',
+        dribbble: ''
+      },
       order: member.order || 0,
       isActive: member.isActive !== false
     });
@@ -183,28 +263,25 @@ const AdminTeam = () => {
           </div>
         ) : (
           members.map(member => (
-            <div key={member._id} className="team-card">
+            <div key={member._id} className="team-card" style={{ borderLeft: `4px solid ${member.color || '#F7D046'}` }}>
               <div className="member-image">
                 {member.image ? (
-                  <img src={member.image} alt={member.name} />
+                  <img src={member.image} alt={member.name || `${member.firstName} ${member.lastName}`} />
                 ) : (
-                  <div className="member-initial">{member.name?.charAt(0)}</div>
+                  <div className="member-initial">{member.firstName?.charAt(0) || member.name?.charAt(0)}</div>
                 )}
                 {!member.isActive && <span className="inactive-badge">Inactive</span>}
               </div>
-              <div className="member-info">
-                <h3 className="member-name">{member.name}</h3>
-                <p className="member-role">{member.role}</p>
-                {member.bio && <p className="member-bio">{member.bio}</p>}
-                <div className="member-socials">
-                  {member.socialLinks?.linkedin && <span>LinkedIn</span>}
-                  {member.socialLinks?.twitter && <span>Twitter</span>}
-                  {member.socialLinks?.github && <span>GitHub</span>}
-                </div>
-              </div>
+              <h3 style={{ color: '#FAF7F2', fontSize: '1.4rem', margin: '0.5rem 0' }}>
+                {member.name || `${member.firstName || ''} ${member.lastName || ''}` || 'No Name'}
+              </h3>
+              <p style={{ color: '#F7D046', fontSize: '0.9rem', margin: '0.25rem 0' }}>
+                {member.role || 'No role'}
+              </p>
+              {member.quote && <p style={{ fontStyle: 'italic', color: '#888' }}>"{member.quote}"</p>}
               <div className="member-actions">
                 <button className="edit-btn" onClick={() => openEditModal(member)}>Edit</button>
-                <button className="delete-btn" onClick={() => handleDelete(member._id)}>Delete</button>
+                <button className="delete-btn" onClick={() => confirmDelete(member)}>Delete</button>
               </div>
             </div>
           ))
@@ -222,22 +299,43 @@ const AdminTeam = () => {
             <form onSubmit={handleSubmit} className="modal-form">
               <div className="form-row">
                 <div className="form-group">
-                  <label>Name *</label>
+                  <label>First Name *</label>
                   <input
                     type="text"
-                    value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    value={formData.firstName}
+                    onChange={e => setFormData({...formData, firstName: e.target.value})}
                     required
                   />
                 </div>
+                <div className="form-group">
+                  <label>Last Name *</label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={e => setFormData({...formData, lastName: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
                 <div className="form-group">
                   <label>Role/Position *</label>
                   <input
                     type="text"
                     value={formData.role}
                     onChange={e => setFormData({...formData, role: e.target.value})}
-                    placeholder="e.g., Founder, Developer"
+                    placeholder="e.g., Founder & CEO, Lead Developer"
                     required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Card Color</label>
+                  <input
+                    type="color"
+                    value={formData.color}
+                    onChange={e => setFormData({...formData, color: e.target.value})}
+                    style={{ height: '40px', cursor: 'pointer' }}
                   />
                 </div>
               </div>
@@ -266,13 +364,93 @@ const AdminTeam = () => {
               </div>
 
               <div className="form-group">
-                <label>Bio</label>
-                <textarea
-                  value={formData.bio}
-                  onChange={e => setFormData({...formData, bio: e.target.value})}
-                  placeholder="Short description about the member..."
-                  rows={3}
+                <label>Quote/Tagline</label>
+                <input
+                  type="text"
+                  value={formData.quote}
+                  onChange={e => setFormData({...formData, quote: e.target.value})}
+                  placeholder="A personal quote or tagline..."
                 />
+              </div>
+
+              <div className="form-section-title">Stats (up to 3)</div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Stat 1 Label</label>
+                  <input
+                    type="text"
+                    value={formData.stats.stat1Label}
+                    onChange={e => setFormData({
+                      ...formData, 
+                      stats: {...formData.stats, stat1Label: e.target.value}
+                    })}
+                    placeholder="e.g., Women Trained"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Stat 1 Value</label>
+                  <input
+                    type="text"
+                    value={formData.stats.stat1Value}
+                    onChange={e => setFormData({
+                      ...formData, 
+                      stats: {...formData.stats, stat1Value: e.target.value}
+                    })}
+                    placeholder="e.g., 5000+"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Stat 2 Label</label>
+                  <input
+                    type="text"
+                    value={formData.stats.stat2Label}
+                    onChange={e => setFormData({
+                      ...formData, 
+                      stats: {...formData.stats, stat2Label: e.target.value}
+                    })}
+                    placeholder="e.g., Events Hosted"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Stat 2 Value</label>
+                  <input
+                    type="text"
+                    value={formData.stats.stat2Value}
+                    onChange={e => setFormData({
+                      ...formData, 
+                      stats: {...formData.stats, stat2Value: e.target.value}
+                    })}
+                    placeholder="e.g., 150+"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Stat 3 Label</label>
+                  <input
+                    type="text"
+                    value={formData.stats.stat3Label}
+                    onChange={e => setFormData({
+                      ...formData, 
+                      stats: {...formData.stats, stat3Label: e.target.value}
+                    })}
+                    placeholder="e.g., Years Experience"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Stat 3 Value</label>
+                  <input
+                    type="text"
+                    value={formData.stats.stat3Value}
+                    onChange={e => setFormData({
+                      ...formData, 
+                      stats: {...formData.stats, stat3Value: e.target.value}
+                    })}
+                    placeholder="e.g., 15+"
+                  />
+                </div>
               </div>
 
               <div className="form-section-title">Social Links</div>
@@ -281,22 +459,24 @@ const AdminTeam = () => {
                   <label>LinkedIn</label>
                   <input
                     type="text"
-                    value={formData.socialLinks.linkedin}
+                    value={formData.social.linkedin}
                     onChange={e => setFormData({
                       ...formData, 
-                      socialLinks: {...formData.socialLinks, linkedin: e.target.value}
+                      social: {...formData.social, linkedin: e.target.value}
                     })}
+                    placeholder="https://linkedin.com/in/..."
                   />
                 </div>
                 <div className="form-group">
                   <label>Twitter</label>
                   <input
                     type="text"
-                    value={formData.socialLinks.twitter}
+                    value={formData.social.twitter}
                     onChange={e => setFormData({
                       ...formData, 
-                      socialLinks: {...formData.socialLinks, twitter: e.target.value}
+                      social: {...formData.social, twitter: e.target.value}
                     })}
+                    placeholder="https://twitter.com/..."
                   />
                 </div>
               </div>
@@ -305,22 +485,50 @@ const AdminTeam = () => {
                   <label>GitHub</label>
                   <input
                     type="text"
-                    value={formData.socialLinks.github}
+                    value={formData.social.github}
                     onChange={e => setFormData({
                       ...formData, 
-                      socialLinks: {...formData.socialLinks, github: e.target.value}
+                      social: {...formData.social, github: e.target.value}
                     })}
+                    placeholder="https://github.com/..."
                   />
                 </div>
                 <div className="form-group">
                   <label>Instagram</label>
                   <input
                     type="text"
-                    value={formData.socialLinks.instagram}
+                    value={formData.social.instagram}
                     onChange={e => setFormData({
                       ...formData, 
-                      socialLinks: {...formData.socialLinks, instagram: e.target.value}
+                      social: {...formData.social, instagram: e.target.value}
                     })}
+                    placeholder="https://instagram.com/..."
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>YouTube</label>
+                  <input
+                    type="text"
+                    value={formData.social.youtube}
+                    onChange={e => setFormData({
+                      ...formData, 
+                      social: {...formData.social, youtube: e.target.value}
+                    })}
+                    placeholder="https://youtube.com/..."
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Dribbble</label>
+                  <input
+                    type="text"
+                    value={formData.social.dribbble}
+                    onChange={e => setFormData({
+                      ...formData, 
+                      social: {...formData.social, dribbble: e.target.value}
+                    })}
+                    placeholder="https://dribbble.com/..."
                   />
                 </div>
               </div>
@@ -353,6 +561,99 @@ const AdminTeam = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setDeleteConfirm({ show: false, id: null, name: '' })}
+        >
+          <div 
+            style={{
+              background: '#1a1a1a',
+              borderRadius: '12px',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '90%',
+              border: '1px solid #333',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'rgba(255, 107, 107, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+                border: '2px solid #ff6b6b'
+              }}>
+                <span style={{ fontSize: '1.8rem' }}>🗑️</span>
+              </div>
+              <h3 style={{ 
+                fontFamily: "'Bebas Neue', sans-serif", 
+                fontSize: '1.5rem', 
+                color: '#fff',
+                marginBottom: '0.5rem',
+                letterSpacing: '1px'
+              }}>
+                Delete Team Member?
+              </h3>
+              <p style={{ color: '#888', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                Are you sure you want to delete <strong style={{ color: '#F7D046' }}>"{deleteConfirm.name}"</strong>? This action cannot be undone.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                onClick={() => setDeleteConfirm({ show: false, id: null, name: '' })}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem 1.5rem',
+                  background: 'transparent',
+                  border: '1px solid #555',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleDelete(deleteConfirm.id)}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem 1.5rem',
+                  background: '#ff6b6b',
+                  border: 'none',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Yes, Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,8 +1,39 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { teamMembers } from '../data/teamData'
+import { teamMembers as fallbackMembers } from '../data/teamData'
 import Navbar from './Navbar'
 import './Team.css'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
+// Helper function to transform API member data to match frontend format
+const transformMember = (member) => {
+  // If member already has the expected format, use it
+  if (member.firstName && member.stats && member.color) {
+    // Convert stats Map to object if needed
+    const stats = member.stats instanceof Map 
+      ? Object.fromEntries(member.stats) 
+      : (typeof member.stats === 'object' ? member.stats : {});
+    return { ...member, stats };
+  }
+  
+  // Transform from old backend format to frontend format
+  return {
+    ...member,
+    id: member.id || member._id || member.name?.toLowerCase().replace(/\s+/g, '-'),
+    firstName: member.firstName || member.name?.split(' ')[0] || '',
+    lastName: member.lastName || member.name?.split(' ').slice(1).join(' ') || '',
+    name: member.name || `${member.firstName} ${member.lastName}`,
+    role: member.role || 'Team Member',
+    image: member.image || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=800&fit=crop',
+    color: member.color || '#F7D046',
+    stats: member.stats instanceof Map 
+      ? Object.fromEntries(member.stats) 
+      : (typeof member.stats === 'object' ? member.stats : {}),
+    quote: member.quote || member.bio || '',
+    social: member.social || member.socialLinks || {}
+  };
+};
 
 function Team() {
   const [loaded, setLoaded] = useState(false)
@@ -10,12 +41,37 @@ function Team() {
   const [expandedMember, setExpandedMember] = useState(null)
   const [isAnimating, setIsAnimating] = useState(false)
   const [hoveredIndex, setHoveredIndex] = useState(null)
+  const [teamMembers, setTeamMembers] = useState(fallbackMembers)
   const containerRef = useRef(null)
   const hoverTimeoutRef = useRef(null)
   const navigate = useNavigate()
 
   // Number of visible cards in the stack
   const visibleCards = 5
+
+  // Fetch team members from API
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const response = await fetch(`${API_URL}/team`);
+        const data = await response.json();
+        
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const transformedMembers = data.data.map(transformMember);
+          setTeamMembers(transformedMembers);
+        } else if (Array.isArray(data) && data.length > 0) {
+          const transformedMembers = data.map(transformMember);
+          setTeamMembers(transformedMembers);
+        }
+        // Keep fallback if no members from API
+      } catch (error) {
+        console.error('Error fetching team members:', error);
+        // Keep fallback members on error
+      }
+    };
+    
+    fetchTeamMembers();
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0)

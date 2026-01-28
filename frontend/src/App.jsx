@@ -16,6 +16,10 @@ import Gallery from './components/Gallery'
 import Articles from './components/Articles'
 import Login from './components/Login'
 import Signup from './components/Signup'
+import AuthCallback from './components/AuthCallback'
+import Profile from './components/Profile'
+import ForgotPassword from './components/ForgotPassword'
+import ResetPassword from './components/ResetPassword'
 
 // Admin Components
 import AdminLayout from './components/admin/AdminLayout'
@@ -25,6 +29,8 @@ import AdminMessages from './components/admin/AdminMessages'
 import AdminTeam from './components/admin/AdminTeam'
 import AdminEvents from './components/admin/AdminEvents'
 import AdminProjects from './components/admin/AdminProjects'
+import AdminGallery from './components/admin/AdminGallery'
+import AdminArticles from './components/admin/AdminArticles'
 
 // Home page component
 function HomePage() {
@@ -55,6 +61,10 @@ function App() {
         <Route path="/articles" element={<Articles />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/profile" element={<Profile />} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -64,6 +74,8 @@ function App() {
           <Route path="team" element={<AdminTeam />} />
           <Route path="events" element={<AdminEvents />} />
           <Route path="projects" element={<AdminProjects />} />
+          <Route path="gallery" element={<AdminGallery />} />
+          <Route path="articles" element={<AdminArticles />} />
         </Route>
       </Routes>
     </div>

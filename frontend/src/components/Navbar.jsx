@@ -58,7 +58,7 @@ function Navbar() {
           </>
         ) : (
           <div className="nav-user-section">
-            <span className="nav-user-name">Hi, {user.firstName}!</span>
+            <Link to="/profile" className="nav-user-name">Hi, {user.firstName}!</Link>
             <button onClick={handleLogout} className="nav-logout-btn">
               LOGOUT
             </button>

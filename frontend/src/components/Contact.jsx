@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Navbar from './Navbar'
 import './Contact.css'
 
-const API_URL = 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 function Contact() {
   const [loaded, setLoaded] = useState(false)
@@ -16,6 +16,7 @@ function Contact() {
   })
   const [focusedField, setFocusedField] = useState(null)
   const [submitted, setSubmitted] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [activeAccordion, setActiveAccordion] = useState(null)
   const [visibleChars, setVisibleChars] = useState({ line1: 0, line2: 0 })
   const animationStarted = useRef(false)
@@ -82,17 +83,20 @@ function Contact() {
       
       if (data.success) {
         setSubmitted(true)
+        setErrorMessage('')
         // Reset after animation
         setTimeout(() => {
           setSubmitted(false)
           setFormData({ firstName: '', lastName: '', email: '', subject: '', message: '' })
         }, 3000)
       } else {
-        alert(data.message || 'Failed to send message. Please try again.');
+        setErrorMessage(data.message || 'Failed to send message. Please try again.');
+        setTimeout(() => setErrorMessage(''), 5000);
       }
     } catch (err) {
       console.error('Contact form error:', err);
-      alert('Server error. Please try again later.');
+      setErrorMessage('Server error. Please try again later.');
+      setTimeout(() => setErrorMessage(''), 5000);
     }
   }
 
@@ -147,6 +151,42 @@ function Contact() {
   return (
     <div className="contact-page">
       <Navbar />
+      
+      {/* Error Toast */}
+      {errorMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '100px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '1rem 2rem',
+          borderRadius: '8px',
+          background: 'rgba(255, 107, 107, 0.95)',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          zIndex: 9999,
+          boxShadow: '0 4px 20px rgba(255, 107, 107, 0.4)',
+          animation: 'slideDown 0.3s ease'
+        }}>
+          <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+          <span style={{ fontWeight: 500 }}>{errorMessage}</span>
+          <button 
+            onClick={() => setErrorMessage('')}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#fff',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              marginLeft: '0.5rem'
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
       
       {/* Floating Particles */}
       <div className="contact-particles">

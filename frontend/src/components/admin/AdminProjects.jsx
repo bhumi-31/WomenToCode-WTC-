@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const AdminProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -9,11 +9,14 @@ const AdminProjects = () => {
   const [editingProject, setEditingProject] = useState(null);
   const [filter, setFilter] = useState('all');
   const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null, title: '' });
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     shortDescription: '',
     creatorName: '',
+    creatorRole: '',
+    creatorImage: '',
     graduationYear: '',
     category: 'web',
     projectType: 'personal',
@@ -108,8 +111,6 @@ const AdminProjects = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this project?')) return;
-    
     const token = localStorage.getItem('token');
     
     try {
@@ -127,7 +128,13 @@ const AdminProjects = () => {
     } catch (error) {
       console.error('Delete error:', error);
       showNotification('Error deleting project. Please try again.', 'error');
+    } finally {
+      setDeleteConfirm({ show: false, id: null, title: '' });
     }
+  };
+
+  const confirmDelete = (project) => {
+    setDeleteConfirm({ show: true, id: project._id, title: project.title });
   };
 
   const openAddModal = () => {
@@ -137,6 +144,8 @@ const AdminProjects = () => {
       description: '',
       shortDescription: '',
       creatorName: '',
+      creatorRole: '',
+      creatorImage: '',
       graduationYear: '',
       category: 'web',
       projectType: 'personal',
@@ -158,6 +167,8 @@ const AdminProjects = () => {
       description: project.description || '',
       shortDescription: project.shortDescription || '',
       creatorName: project.creatorName || '',
+      creatorRole: project.creatorRole || '',
+      creatorImage: project.creatorImage || '',
       graduationYear: project.graduationYear || '',
       category: project.category || 'web',
       projectType: project.projectType || 'personal',
@@ -182,6 +193,8 @@ const AdminProjects = () => {
     if (filter === 'featured') return project.isFeatured;
     return project.category === filter || project.status === filter;
   });
+
+  console.log('Projects:', projects.length, 'Filtered:', filteredProjects.length);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -238,58 +251,65 @@ const AdminProjects = () => {
       </div>
 
       {/* Projects Grid */}
-      <div className="projects-grid">
-        {filteredProjects.length === 0 ? (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
+        
+        {filteredProjects.map((project, index) => (
+          <div key={project._id || index} style={{
+            background: '#111111',
+            border: '2px solid #F7D046',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{
+              height: '180px',
+              background: '#222222',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative'
+            }}>
+              {project.image ? (
+                <img src={project.image} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontSize: '3rem' }}>📁</span>
+              )}
+              {project.isFeatured && (
+                <span style={{ position: 'absolute', top: '10px', right: '10px', background: '#F7D046', color: '#000', padding: '0.25rem 0.5rem', fontSize: '0.7rem' }}>⭐ Featured</span>
+              )}
+            </div>
+            <div style={{ padding: '1.5rem', flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.2rem', margin: 0, color: '#FAF7F2' }}>{project.title}</h3>
+                <span style={{ color: getStatusColor(project.status), fontSize: '0.8rem' }}>
+                  {project.status?.replace('-', ' ').toUpperCase() || 'IN PROGRESS'}
+                </span>
+              </div>
+              {project.creatorName && (
+                <p style={{ color: '#F7D046', fontSize: '0.85rem', margin: '0.5rem 0' }}>
+                  By <strong>{project.creatorName}</strong>
+                  {project.graduationYear && ` • Class of ${project.graduationYear}`}
+                </p>
+              )}
+              <p style={{ color: '#888888', fontSize: '0.85rem', margin: '0.5rem 0' }}>{project.shortDescription || project.description?.substring(0, 100)}</p>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
+                <span style={{ background: '#222222', padding: '0.2rem 0.5rem', fontSize: '0.7rem', color: '#F7D046' }}>{project.category}</span>
+                {Array.isArray(project.technologies) && project.technologies.slice(0, 3).map(tech => (
+                  <span key={tech} style={{ background: '#222222', padding: '0.2rem 0.5rem', fontSize: '0.7rem', color: '#888' }}>{tech}</span>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', padding: '1rem 1.5rem', borderTop: '1px solid #222222' }}>
+              <button onClick={() => openEditModal(project)} style={{ flex: 1, background: 'transparent', border: '1px solid #F7D046', color: '#F7D046', padding: '0.5rem', cursor: 'pointer' }}>Edit</button>
+              <button onClick={() => confirmDelete(project)} style={{ flex: 1, background: 'transparent', border: '1px solid #ff6b6b', color: '#ff6b6b', padding: '0.5rem', cursor: 'pointer' }}>Delete</button>
+            </div>
+          </div>
+        ))}
+        
+        {filteredProjects.length === 0 && (
           <div className="empty-state">
             <p>No projects found</p>
             <button className="add-btn" onClick={openAddModal}>Add First Project</button>
           </div>
-        ) : (
-          filteredProjects.map(project => (
-            <div key={project._id} className="project-card">
-              <div className="project-image">
-                {project.image ? (
-                  <img src={project.image} alt={project.title} />
-                ) : (
-                  <div className="project-placeholder">📁</div>
-                )}
-                {project.isFeatured && <span className="featured-badge">⭐ Featured</span>}
-                {!project.isVisible && <span className="hidden-badge">Hidden</span>}
-              </div>
-              <div className="project-info">
-                <div className="project-header">
-                  <h3 className="project-title">{project.title}</h3>
-                  <span 
-                    className="project-status"
-                    style={{ color: getStatusColor(project.status) }}
-                  >
-                    {project.status?.replace('-', ' ').toUpperCase()}
-                  </span>
-                </div>
-                {project.creatorName && (
-                  <p className="project-creator-info">
-                    By <strong>{project.creatorName}</strong>
-                    {project.graduationYear && ` • Class of ${project.graduationYear}`}
-                  </p>
-                )}
-                <p className="project-desc">{project.shortDescription || project.description?.substring(0, 100)}</p>
-                <div className="project-meta">
-                  <span className="project-category">{project.category}</span>
-                  {Array.isArray(project.technologies) && project.technologies.slice(0, 3).map(tech => (
-                    <span key={tech} className="tech-tag">{tech}</span>
-                  ))}
-                </div>
-                <div className="project-links">
-                  {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noreferrer">🔗 Live</a>}
-                  {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noreferrer">📦 GitHub</a>}
-                </div>
-              </div>
-              <div className="project-actions">
-                <button className="edit-btn" onClick={() => openEditModal(project)}>Edit</button>
-                <button className="delete-btn" onClick={() => handleDelete(project._id)}>Delete</button>
-              </div>
-            </div>
-          ))
         )}
       </div>
 
@@ -312,6 +332,7 @@ const AdminProjects = () => {
                 />
               </div>
 
+              <div className="form-section-title">Creator Information</div>
               <div className="form-row">
                 <div className="form-group">
                   <label>Creator Name *</label>
@@ -324,6 +345,18 @@ const AdminProjects = () => {
                   />
                 </div>
                 <div className="form-group">
+                  <label>Creator Role / Title</label>
+                  <input
+                    type="text"
+                    value={formData.creatorRole}
+                    onChange={e => setFormData({...formData, creatorRole: e.target.value})}
+                    placeholder="e.g., Full Stack Developer"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
                   <label>Year of Graduation</label>
                   <input
                     type="text"
@@ -331,6 +364,15 @@ const AdminProjects = () => {
                     onChange={e => setFormData({...formData, graduationYear: e.target.value})}
                     placeholder="e.g., 2024"
                     maxLength={4}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Creator Photo URL</label>
+                  <input
+                    type="text"
+                    value={formData.creatorImage}
+                    onChange={e => setFormData({...formData, creatorImage: e.target.value})}
+                    placeholder="https://... or leave blank"
                   />
                 </div>
               </div>
@@ -485,6 +527,101 @@ const AdminProjects = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setDeleteConfirm({ show: false, id: null, title: '' })}
+        >
+          <div 
+            style={{
+              background: '#1a1a1a',
+              borderRadius: '12px',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '90%',
+              border: '1px solid #333',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'rgba(255, 107, 107, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+                border: '2px solid #ff6b6b'
+              }}>
+                <span style={{ fontSize: '1.8rem' }}>🗑️</span>
+              </div>
+              <h3 style={{ 
+                fontFamily: "'Bebas Neue', sans-serif", 
+                fontSize: '1.5rem', 
+                color: '#fff',
+                marginBottom: '0.5rem',
+                letterSpacing: '1px'
+              }}>
+                Delete Project?
+              </h3>
+              <p style={{ color: '#888', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                Are you sure you want to delete <strong style={{ color: '#F7D046' }}>"{deleteConfirm.title}"</strong>? This action cannot be undone.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                onClick={() => setDeleteConfirm({ show: false, id: null, title: '' })}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem 1.5rem',
+                  background: 'transparent',
+                  border: '1px solid #555',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleDelete(deleteConfirm.id)}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem 1.5rem',
+                  background: '#ff6b6b',
+                  border: 'none',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Yes, Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

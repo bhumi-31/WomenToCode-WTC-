@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import './Admin.css';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const AdminLayout = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,8 +27,8 @@ const AdminLayout = () => {
     const userData = JSON.parse(storedUser);
     
     if (userData.role !== 'admin') {
-      alert('Access Denied! Admin only.');
-      navigate('/');
+      setAccessDenied(true);
+      setTimeout(() => navigate('/'), 3000);
       return;
     }
 
@@ -48,6 +49,8 @@ const AdminLayout = () => {
     { path: '/admin/team', label: 'TEAM' },
     { path: '/admin/events', label: 'EVENTS' },
     { path: '/admin/projects', label: 'PROJECTS' },
+    { path: '/admin/gallery', label: 'GALLERY' },
+    { path: '/admin/articles', label: 'ARTICLES' },
   ];
 
   const isActive = (path, exact = false) => {
@@ -61,6 +64,73 @@ const AdminLayout = () => {
         <div className="loading-content">
           <span className="loading-logo">W</span>
           <p>LOADING...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (accessDenied) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: '#0a0a0a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          padding: '3rem',
+          background: '#1a1a1a',
+          borderRadius: '12px',
+          border: '1px solid #ff6b6b'
+        }}>
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: 'rgba(255, 107, 107, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 1.5rem',
+            border: '2px solid #ff6b6b'
+          }}>
+            <span style={{ fontSize: '2.5rem' }}>🚫</span>
+          </div>
+          <h2 style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: '2rem',
+            color: '#ff6b6b',
+            marginBottom: '0.5rem',
+            letterSpacing: '2px'
+          }}>
+            ACCESS DENIED
+          </h2>
+          <p style={{ color: '#888', marginBottom: '1rem' }}>
+            Admin access only. Redirecting to homepage...
+          </p>
+          <div style={{
+            width: '100px',
+            height: '4px',
+            background: '#333',
+            borderRadius: '2px',
+            margin: '0 auto',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              background: '#F7D046',
+              animation: 'shrink 3s linear forwards'
+            }} />
+          </div>
+          <style>{`
+            @keyframes shrink {
+              from { transform: translateX(0); }
+              to { transform: translateX(-100%); }
+            }
+          `}</style>
         </div>
       </div>
     );

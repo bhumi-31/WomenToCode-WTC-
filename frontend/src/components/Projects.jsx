@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
 import './Projects.css';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const categories = ['All', 'Web Development', 'Mobile', 'Data Science', 'AI/ML', 'Design'];
 
@@ -363,6 +363,31 @@ const Projects = () => {
                     </a>
                   )}
                 </div>
+
+                {/* Creator Info Section */}
+                {selectedProject.creatorName && (
+                  <div className="modal-creator">
+                    <div className="creator-avatar">
+                      {selectedProject.creatorImage ? (
+                        <img src={selectedProject.creatorImage} alt={selectedProject.creatorName} />
+                      ) : (
+                        <span className="avatar-initials">
+                          {selectedProject.creatorName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="creator-details">
+                      <span className="creator-label">Created by</span>
+                      <span className="creator-name">{selectedProject.creatorName}</span>
+                      {selectedProject.creatorRole && (
+                        <span className="creator-role">{selectedProject.creatorRole}</span>
+                      )}
+                      {selectedProject.graduationYear && (
+                        <span className="creator-year">Class of {selectedProject.graduationYear}</span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 <div className="modal-status">
                   <span className={`status-badge ${selectedProject.status}`}>

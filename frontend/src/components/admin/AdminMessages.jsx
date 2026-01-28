@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const AdminMessages = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null, subject: '' });
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => setNotification({ show: false, message: '', type: '' }), 4000);
+  };
 
   useEffect(() => {
     fetchMessages();
@@ -53,8 +60,6 @@ const AdminMessages = () => {
   };
 
   const handleDelete = async (messageId) => {
-    if (!confirm('Delete this message?')) return;
-    
     const token = localStorage.getItem('token');
     
     try {
@@ -70,10 +75,20 @@ const AdminMessages = () => {
         if (selectedMessage?._id === messageId) {
           setSelectedMessage(null);
         }
+        showNotification('Message deleted successfully!', 'success');
+      } else {
+        showNotification('Error deleting message', 'error');
       }
     } catch (error) {
       console.error('Delete error:', error);
+      showNotification('Error deleting message', 'error');
+    } finally {
+      setDeleteConfirm({ show: false, id: null, subject: '' });
     }
+  };
+
+  const confirmDelete = (message) => {
+    setDeleteConfirm({ show: true, id: message._id, subject: message.subject || 'this message' });
   };
 
   const filteredMessages = messages.filter(msg => {
@@ -181,7 +196,7 @@ const AdminMessages = () => {
                   </a>
                   <button 
                     className="btn-delete"
-                    onClick={() => handleDelete(selectedMessage._id)}
+                    onClick={() => confirmDelete(selectedMessage)}
                   >
                     DELETE
                   </button>
@@ -210,6 +225,120 @@ const AdminMessages = () => {
           )}
         </div>
       </div>
+
+      {/* Notification */}
+      {notification.show && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          padding: '1rem 1.5rem',
+          borderRadius: '8px',
+          background: notification.type === 'success' ? 'rgba(76, 175, 80, 0.9)' : 'rgba(255, 107, 107, 0.9)',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          zIndex: 3000,
+          boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+        }}>
+          <span>{notification.type === 'success' ? '✓' : '✕'}</span>
+          <span>{notification.message}</span>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setDeleteConfirm({ show: false, id: null, subject: '' })}
+        >
+          <div 
+            style={{
+              background: '#1a1a1a',
+              borderRadius: '12px',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '90%',
+              border: '1px solid #333',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'rgba(255, 107, 107, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+                border: '2px solid #ff6b6b'
+              }}>
+                <span style={{ fontSize: '1.8rem' }}>🗑️</span>
+              </div>
+              <h3 style={{ 
+                fontFamily: "'Bebas Neue', sans-serif", 
+                fontSize: '1.5rem', 
+                color: '#fff',
+                marginBottom: '0.5rem',
+                letterSpacing: '1px'
+              }}>
+                Delete Message?
+              </h3>
+              <p style={{ color: '#888', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                Are you sure you want to delete <strong style={{ color: '#F7D046' }}>"{deleteConfirm.subject}"</strong>? This action cannot be undone.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                onClick={() => setDeleteConfirm({ show: false, id: null, subject: '' })}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem 1.5rem',
+                  background: 'transparent',
+                  border: '1px solid #555',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleDelete(deleteConfirm.id)}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem 1.5rem',
+                  background: '#ff6b6b',
+                  border: 'none',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
