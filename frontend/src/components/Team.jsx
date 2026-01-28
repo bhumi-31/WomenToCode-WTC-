@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { teamMembers as fallbackMembers } from '../data/teamData'
 import Navbar from './Navbar'
 import './Team.css'
 
@@ -41,7 +40,8 @@ function Team() {
   const [expandedMember, setExpandedMember] = useState(null)
   const [isAnimating, setIsAnimating] = useState(false)
   const [hoveredIndex, setHoveredIndex] = useState(null)
-  const [teamMembers, setTeamMembers] = useState(fallbackMembers)
+  const [teamMembers, setTeamMembers] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
   const containerRef = useRef(null)
   const hoverTimeoutRef = useRef(null)
   const navigate = useNavigate()
@@ -53,6 +53,7 @@ function Team() {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch(`${API_URL}/team`);
         const data = await response.json();
         
@@ -63,10 +64,10 @@ function Team() {
           const transformedMembers = data.map(transformMember);
           setTeamMembers(transformedMembers);
         }
-        // Keep fallback if no members from API
       } catch (error) {
         console.error('Error fetching team members:', error);
-        // Keep fallback members on error
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -179,6 +180,58 @@ function Team() {
     <div className={`team-page ${expandedMember ? 'member-expanded' : ''}`}>
       <Navbar />
       
+      {/* Loading State - Skeleton Cards */}
+      {isLoading ? (
+        <section className="team-showcase">
+          <div className={`team-info ${loaded ? 'visible' : ''}`}>
+            <span className="team-label">OUR TEAM</span>
+            <h1 className="team-main-title">
+              <span className="title-line">MEET THE</span>
+              <span className="title-line accent">INCREDIBLE</span>
+              <span className="title-line">WOMEN</span>
+            </h1>
+            <div className="skeleton-text" style={{ width: '60%', height: '20px', marginBottom: '2rem' }}></div>
+            <div className="skeleton-nav">
+              <div className="skeleton-btn"></div>
+              <div className="skeleton-counter"></div>
+              <div className="skeleton-btn"></div>
+            </div>
+          </div>
+          <div className="cards-container">
+            <div className="card-stack">
+              {[...Array(3)].map((_, idx) => (
+                <div
+                  key={idx}
+                  className="skeleton-card"
+                  style={{
+                    '--stack-index': idx,
+                    zIndex: 5 - idx,
+                  }}
+                >
+                  <div className="skeleton-image"></div>
+                  <div className="skeleton-info">
+                    <div className="skeleton-name"></div>
+                    <div className="skeleton-role"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : teamMembers.length === 0 ? (
+        <section className="team-showcase">
+          <div className={`team-info ${loaded ? 'visible' : ''}`}>
+            <span className="team-label">OUR TEAM</span>
+            <h1 className="team-main-title">
+              <span className="title-line">MEET THE</span>
+              <span className="title-line accent">INCREDIBLE</span>
+              <span className="title-line">WOMEN</span>
+            </h1>
+            <p className="team-description">No team members found</p>
+          </div>
+        </section>
+      ) : (
+      <>
       {/* Main Team Section */}
       <section className="team-showcase">
         {/* Left Side - Title & Info */}
@@ -190,7 +243,7 @@ function Team() {
             <span className="title-line">WOMEN</span>
           </h1>
           <p className="team-description">
-            17 passionate leaders driving innovation and empowering women in tech
+            {teamMembers.length} passionate leaders driving innovation and empowering women in tech
           </p>
           
           {/* Navigation */}
@@ -406,6 +459,8 @@ function Team() {
           <button className="join-btn">View Open Positions</button>
         </div>
       </section>
+      </>
+      )}
     </div>
   )
 }

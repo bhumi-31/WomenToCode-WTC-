@@ -335,18 +335,16 @@
 }
 
 .input-icon {
-  position: absolute;
-  left: 14px;
-  width: 18px;
-  height: 18px;
-  color: rgba(255, 255, 255, 0.4);
-  pointer-events: none;
-  z-index: 1;
+  width: 20px;
+  height: 20px;
+  color: #F7D046;
+  flex-shrink: 0;
+  margin-right: 8px;
 }
 
 .input-wrapper input {
   width: 100%;
-  padding: 14px 45px 14px 46px;
+  padding: 14px 45px 14px 14px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
