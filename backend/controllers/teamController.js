@@ -75,15 +75,19 @@ exports.getMember = async (req, res) => {
 // Admin only - requires login + admin role
 exports.createMember = async (req, res) => {
   try {
-    const { name, role, image, bio, socialLinks, order } = req.body;
+    const { firstName, lastName, role, image, color, quote, stats, social, order, isActive } = req.body;
 
     const member = await Team.create({
-      name,
+      firstName,
+      lastName,
       role,
       image,
-      bio,
-      socialLinks,
-      order
+      color,
+      quote,
+      stats,
+      social,
+      order,
+      isActive
     });
 
     res.status(201).json({
@@ -93,6 +97,7 @@ exports.createMember = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Create member error:', error);
     res.status(500).json({
       success: false,
       message: 'Could not create team member',

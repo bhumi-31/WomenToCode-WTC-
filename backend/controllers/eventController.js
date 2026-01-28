@@ -10,11 +10,11 @@
 const Event = require('../models/Event');
 
 // @desc    Get all upcoming/active events
-// @route   GET /api/events
+// @route   GET /events
 // @access  Public
 exports.getAllEvents = async (req, res) => {
   try {
-    const { eventType, status, featured, city, isOnline } = req.query;
+    const { type, status, featured, isOnline } = req.query;
     
     // Build filter - show active events only
     const filter = { isActive: true };
@@ -26,13 +26,12 @@ exports.getAllEvents = async (req, res) => {
       filter.status = { $in: ['upcoming', 'ongoing'] };
     }
     
-    if (eventType) filter.eventType = eventType;
+    if (type) filter.type = type;
     if (featured === 'true') filter.isFeatured = true;
-    if (city) filter.city = city;
     if (isOnline === 'true') filter.isOnline = true;
     if (isOnline === 'false') filter.isOnline = false;
 
-    const events = await Event.find(filter).sort({ startDate: 1 });
+    const events = await Event.find(filter).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -49,7 +48,7 @@ exports.getAllEvents = async (req, res) => {
 };
 
 // @desc    Get single event by ID or slug
-// @route   GET /api/events/:identifier
+// @route   GET /events/:identifier
 // @access  Public
 exports.getEvent = async (req, res) => {
   try {
@@ -85,19 +84,19 @@ exports.getEvent = async (req, res) => {
 };
 
 // @desc    Get events by type
-// @route   GET /api/events/type/:eventType
+// @route   GET /events/type/:type
 // @access  Public
 exports.getEventsByType = async (req, res) => {
   try {
     const events = await Event.find({
-      eventType: req.params.eventType,
+      type: req.params.type,
       isActive: true,
       status: { $in: ['upcoming', 'ongoing'] }
-    }).sort({ startDate: 1 });
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      eventType: req.params.eventType,
+      type: req.params.type,
       count: events.length,
       data: events
     });
@@ -110,20 +109,15 @@ exports.getEventsByType = async (req, res) => {
   }
 };
 
-// @desc    Get upcoming events (next 30 days)
-// @route   GET /api/events/upcoming
+// @desc    Get upcoming events
+// @route   GET /events/upcoming
 // @access  Public
 exports.getUpcomingEvents = async (req, res) => {
   try {
-    const today = new Date();
-    const thirtyDaysLater = new Date();
-    thirtyDaysLater.setDate(today.getDate() + 30);
-
     const events = await Event.find({
       isActive: true,
-      status: 'upcoming',
-      startDate: { $gte: today, $lte: thirtyDaysLater }
-    }).sort({ startDate: 1 });
+      status: 'upcoming'
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -140,7 +134,7 @@ exports.getUpcomingEvents = async (req, res) => {
 };
 
 // @desc    Create new event
-// @route   POST /api/events
+// @route   POST /events
 // @access  Private (Admin only)
 exports.createEvent = async (req, res) => {
   try {

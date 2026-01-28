@@ -9,10 +9,13 @@
 // - Login (verify user and give token)
 // - Get current user info
 // - Check if user is admin (for dashboard access)
+// - Forgot password / Reset password
 // ===========================================
 
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { sendWelcomeEmail, sendPasswordResetEmail, sendPasswordResetSuccessEmail } = require('../utils/emailService');
 
 // ------------------------------------------
 // Helper: Create JWT Token
@@ -93,6 +96,13 @@ exports.register = async (req, res) => {
     // Create token for automatic login
     // ------------------------------------------
     const token = createToken(user._id);
+
+    // ------------------------------------------
+    // Send welcome email (async, don't wait)
+    // ------------------------------------------
+    sendWelcomeEmail(user.email, user.firstName).catch(err => {
+      console.error('Failed to send welcome email:', err);
+    });
 
     // ------------------------------------------
     // Send success response
@@ -413,6 +423,214 @@ exports.updateUserRole = async (req, res) => {
       success: false,
       message: 'Could not update user role',
       error: error.message
+    });
+  }
+};
+
+// ------------------------------------------
+// FORGOT PASSWORD - Send reset email
+// ------------------------------------------
+// POST /api/auth/forgot-password
+// Body: { email }
+//
+// FLOW:
+// 1. User enters their email
+// 2. We find the user
+// 3. Generate a reset token
+// 4. Save token to database with expiry
+// 5. Send email with reset link
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide your email address'
+      });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
+    if (!user) {
+      // Don't reveal if email exists for security
+      return res.status(200).json({
+        success: true,
+        message: 'If an account exists with this email, you will receive a password reset link.'
+      });
+    }
+
+    // Check if user signed up with OAuth
+    if (user.authProvider !== 'local') {
+      return res.status(400).json({
+        success: false,
+        message: `This account uses ${user.authProvider} login. Please sign in with ${user.authProvider} instead.`
+      });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    
+    // Hash token before saving to database
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    
+    // Save to user document
+    user.passwordResetToken = hashedToken;
+    user.passwordResetExpires = Date.now() + 3600000; // 1 hour from now
+    await user.save({ validateBeforeSave: false });
+
+    // Send email
+    const emailSent = await sendPasswordResetEmail(user.email, user.firstName, resetToken);
+    
+    if (!emailSent) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send email. Please try again later.'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset link sent to your email!'
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong. Please try again.',
+      error: error.message
+    });
+  }
+};
+
+// ------------------------------------------
+// RESET PASSWORD - Set new password
+// ------------------------------------------
+// POST /api/auth/reset-password/:token
+// Body: { password }
+//
+// FLOW:
+// 1. User clicks link from email
+// 2. We verify the token
+// 3. Check if token hasn't expired
+// 4. Update password
+// 5. Clear reset token fields
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a new password'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters'
+      });
+    }
+
+    // Hash the token from URL to compare with stored hash
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with matching token that hasn't expired
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset link. Please request a new one.'
+      });
+    }
+
+    // Update password
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    // Send confirmation email
+    sendPasswordResetSuccessEmail(user.email, user.firstName).catch(err => {
+      console.error('Failed to send password reset success email:', err);
+    });
+
+    // Create new token so user is logged in
+    const authToken = createToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successful! You are now logged in.',
+      data: {
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role
+        },
+        token: authToken
+      }
+    });
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong. Please try again.',
+      error: error.message
+    });
+  }
+};
+
+// ------------------------------------------
+// VERIFY RESET TOKEN - Check if token is valid
+// ------------------------------------------
+// GET /api/auth/reset-password/:token/verify
+exports.verifyResetToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // Hash the token from URL
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with matching token that hasn't expired
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        valid: false,
+        message: 'Invalid or expired reset link'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      valid: true,
+      message: 'Token is valid'
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      valid: false,
+      message: 'Something went wrong'
     });
   }
 };

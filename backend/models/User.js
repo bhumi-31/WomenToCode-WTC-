@@ -19,6 +19,45 @@ const bcrypt = require('bcryptjs');  // For encrypting passwords
 // Define the "shape" of a User
 const userSchema = new mongoose.Schema({
   // ------------------------------------------
+  // GOOGLE ID (for OAuth users)
+  // ------------------------------------------
+  // Stores Google's unique user ID for OAuth login
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true  // Allows null for non-Google users
+  },
+
+  // ------------------------------------------
+  // GITHUB ID (for OAuth users)
+  // ------------------------------------------
+  // Stores GitHub's unique user ID for OAuth login
+  githubId: {
+    type: String,
+    unique: true,
+    sparse: true  // Allows null for non-GitHub users
+  },
+
+  // ------------------------------------------
+  // AUTH PROVIDER
+  // ------------------------------------------
+  // How the user signed up: 'local', 'google', or 'github'
+  authProvider: {
+    type: String,
+    enum: ['local', 'google', 'github'],
+    default: 'local'
+  },
+
+  // ------------------------------------------
+  // AVATAR (profile picture)
+  // ------------------------------------------
+  // URL to user's profile picture (from Google/GitHub or uploaded)
+  avatar: {
+    type: String,
+    default: null
+  },
+
+  // ------------------------------------------
   // FIRST NAME
   // ------------------------------------------
   // The user's first name (e.g., "Fatima")
@@ -35,9 +74,13 @@ const userSchema = new mongoose.Schema({
   // The user's last name (e.g., "Khan")
   lastName: {
     type: String,
-    required: [true, 'Please provide your last name'],
+    required: function() {
+      // Only required for local auth, Google might not provide it
+      return this.authProvider === 'local';
+    },
     trim: true,
-    maxlength: [50, 'Last name cannot exceed 50 characters']
+    maxlength: [50, 'Last name cannot exceed 50 characters'],
+    default: ''
   },
 
   // ------------------------------------------
@@ -60,9 +103,13 @@ const userSchema = new mongoose.Schema({
   // PASSWORD
   // ------------------------------------------
   // Will be encrypted before saving
+  // Not required for OAuth users
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
+    required: function() {
+      // Only required for local auth (email/password)
+      return this.authProvider === 'local';
+    },
     minlength: [6, 'Password must be at least 6 characters'],
     select: false  // Don't include password when fetching users
   },
@@ -70,16 +117,14 @@ const userSchema = new mongoose.Schema({
   // ------------------------------------------
   // AGREE TO TERMS
   // ------------------------------------------
-  // User must check the checkbox to register
+  // User must check the checkbox to register (for local auth)
+  // OAuth users implicitly agree by using the service
   agreeToTerms: {
     type: Boolean,
-    required: [true, 'You must agree to the terms and conditions'],
-    validate: {
-      validator: function(value) {
-        return value === true;  // Must be true, not false
-      },
-      message: 'You must agree to the terms and conditions to register'
-    }
+    required: function() {
+      return this.authProvider === 'local';
+    },
+    default: false
   },
 
   // ------------------------------------------
@@ -100,6 +145,54 @@ const userSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+
+  // ------------------------------------------
+  // PROFILE FIELDS
+  // ------------------------------------------
+  bio: {
+    type: String,
+    maxlength: [500, 'Bio cannot exceed 500 characters'],
+    default: ''
+  },
+  
+  location: {
+    type: String,
+    maxlength: [100, 'Location cannot exceed 100 characters'],
+    default: ''
+  },
+  
+  website: {
+    type: String,
+    default: ''
+  },
+  
+  github: {
+    type: String,
+    default: ''
+  },
+  
+  linkedin: {
+    type: String,
+    default: ''
+  },
+  
+  twitter: {
+    type: String,
+    default: ''
+  },
+
+  // ------------------------------------------
+  // PASSWORD RESET FIELDS
+  // ------------------------------------------
+  passwordResetToken: {
+    type: String,
+    default: null
+  },
+  
+  passwordResetExpires: {
+    type: Date,
+    default: null
   },
 
   // ------------------------------------------

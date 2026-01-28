@@ -32,6 +32,15 @@ const projectSchema = new mongoose.Schema({
     trim: true
     // Name of the person who created the project
   },
+  creatorRole: {
+    type: String,
+    trim: true
+    // Role like "Full Stack Developer", "AI Engineer"
+  },
+  creatorImage: {
+    type: String
+    // Photo URL of the creator
+  },
   graduationYear: {
     type: String,
     // Year of graduation e.g., "2024"

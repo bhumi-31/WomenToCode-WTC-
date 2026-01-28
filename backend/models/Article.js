@@ -39,6 +39,12 @@ const articleSchema = new mongoose.Schema({
     // Main image for the article
   },
 
+  // Medium Link (for external article redirect)
+  mediumUrl: {
+    type: String
+    // Direct link to Medium article: "https://medium.com/@womentocode/article-slug"
+  },
+
   // Author
   author: {
     type: mongoose.Schema.Types.ObjectId,

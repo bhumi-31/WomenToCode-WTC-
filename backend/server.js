@@ -28,6 +28,7 @@ require('dotenv').config();
 
 // Import our custom modules
 const connectDB = require('./config/db');
+const passport = require('./config/passport');  // Google OAuth config
 const authRoutes = require('./routes/authRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const projectRoutes = require('./routes/projectRoutes');
@@ -45,9 +46,15 @@ const app = express();
 // ------------------------------------------
 // STEP 3: Middleware
 // ------------------------------------------
-app.use(cors());           // Allow cross-origin requests
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));   // Parse JSON bodies with larger limit for base64 images
 app.use(express.urlencoded({ limit: '50mb', extended: true }));  // Parse URL-encoded bodies
+
+// Initialize Passport (for Google OAuth)
+app.use(passport.initialize());
 
 // ------------------------------------------
 // STEP 4: API Routes
