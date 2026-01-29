@@ -35,6 +35,32 @@ const transformEvent = (event) => {
   };
 };
 
+// Skeleton Event Card
+const SkeletonCard = ({ index }) => (
+  <div className="event-card skeleton-card visible" style={{ '--delay': `${index * 0.1}s` }}>
+    <div className="event-card-date skeleton-item">
+      <div className="skeleton-shimmer"></div>
+    </div>
+    <div className="event-card-speaker">
+      <div className="card-speaker-img skeleton-item"><div className="skeleton-shimmer"></div></div>
+      <div className="card-speaker-info">
+        <div className="skeleton-text skeleton-item" style={{width: '80px', height: '14px'}}><div className="skeleton-shimmer"></div></div>
+        <div className="skeleton-text skeleton-item" style={{width: '60px', height: '10px', marginTop: '5px'}}><div className="skeleton-shimmer"></div></div>
+      </div>
+    </div>
+    <div className="event-card-content">
+      <div className="skeleton-text skeleton-item" style={{width: '70px', height: '20px'}}><div className="skeleton-shimmer"></div></div>
+      <div className="skeleton-text skeleton-item" style={{width: '100%', height: '24px', marginTop: '10px'}}><div className="skeleton-shimmer"></div></div>
+      <div className="skeleton-text skeleton-item" style={{width: '100%', height: '40px', marginTop: '10px'}}><div className="skeleton-shimmer"></div></div>
+      <div className="card-meta" style={{marginTop: '15px'}}>
+        <div className="skeleton-text skeleton-item" style={{width: '80px', height: '14px'}}><div className="skeleton-shimmer"></div></div>
+        <div className="skeleton-text skeleton-item" style={{width: '100px', height: '14px'}}><div className="skeleton-shimmer"></div></div>
+      </div>
+      <div className="skeleton-text skeleton-item" style={{width: '100px', height: '36px', marginTop: '15px', borderRadius: '20px'}}><div className="skeleton-shimmer"></div></div>
+    </div>
+  </div>
+);
+
 function Events() {
   const [loaded, setLoaded] = useState(false)
   const [filter, setFilter] = useState('all')
@@ -128,9 +154,8 @@ function Events() {
       {/* Events Grid */}
       <section className="events-grid-section">
         {loading ? (
-          <div className="events-loading">
-            <div className="loader"></div>
-            <p>Loading events...</p>
+          <div className="events-grid">
+            {[1, 2, 3].map((i) => <SkeletonCard key={i} index={i} />)}
           </div>
         ) : (
           <div className="events-grid">
