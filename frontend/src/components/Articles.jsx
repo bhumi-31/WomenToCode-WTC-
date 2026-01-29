@@ -6,6 +6,30 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const categories = ['All', 'Career', 'Tech', 'Community', 'Leadership', 'Tutorial'];
 
+// Skeleton Article Card
+const SkeletonCard = ({ index }) => (
+  <div className="article-card skeleton-card visible" style={{ animationDelay: `${index * 0.1}s` }}>
+    <div className="article-image skeleton-item">
+      <div className="skeleton-shimmer"></div>
+    </div>
+    <div className="article-content">
+      <div className="article-meta">
+        <span className="skeleton-text skeleton-item" style={{width: '60px', height: '20px'}}><div className="skeleton-shimmer"></div></span>
+        <span className="skeleton-text skeleton-item" style={{width: '70px', height: '16px'}}><div className="skeleton-shimmer"></div></span>
+      </div>
+      <div className="skeleton-text skeleton-item" style={{width: '100%', height: '24px', marginTop: '10px'}}><div className="skeleton-shimmer"></div></div>
+      <div className="skeleton-text skeleton-item" style={{width: '100%', height: '40px', marginTop: '8px'}}><div className="skeleton-shimmer"></div></div>
+      <div className="article-footer" style={{marginTop: '15px'}}>
+        <div className="article-author">
+          <div className="skeleton-avatar skeleton-item"><div className="skeleton-shimmer"></div></div>
+          <span className="skeleton-text skeleton-item" style={{width: '80px', height: '14px'}}><div className="skeleton-shimmer"></div></span>
+        </div>
+        <span className="skeleton-text skeleton-item" style={{width: '60px', height: '14px'}}><div className="skeleton-shimmer"></div></span>
+      </div>
+    </div>
+  </div>
+);
+
 const Articles = () => {
   const [articles, setArticles] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -127,8 +151,8 @@ const Articles = () => {
                 ))}
               </span>
             </h1>
-            <p className={`articles-stats ${isVisible ? 'visible' : ''}`}>
-              {totalArticles} articles by our community
+            <p className={`articles-stats ${isVisible && !isLoading ? 'visible' : ''}`}>
+              {isLoading ? '' : `${totalArticles} articles by our community`}
             </p>
           </div>
           
@@ -200,7 +224,9 @@ const Articles = () => {
 
         {/* Articles Grid */}
         <div className="articles-grid">
-          {filteredArticles
+          {isLoading ? (
+            [1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} index={i} />)
+          ) : filteredArticles
             .filter(article => activeCategory !== 'All' || !article.featured)
             .map((article, index) => (
             <a
