@@ -177,7 +177,7 @@ function Team() {
             <h1 className="team-main-title">
               <span className="title-line">MEET THE</span>
               <span className="title-line accent">INCREDIBLE</span>
-              <span className="title-line">WOMEN</span>
+              <span className="title-line">TEAM</span>
             </h1>
             <div className="skeleton-text" style={{ width: '60%', height: '20px', marginBottom: '2rem' }}></div>
             <div className="skeleton-nav">
