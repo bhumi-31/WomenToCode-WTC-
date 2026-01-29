@@ -487,13 +487,44 @@ const AdminEvents = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label>Speaker Image URL</label>
+                <label>Speaker Image</label>
                 <input
-                  type="text"
-                  value={formData.speaker.image}
-                  onChange={e => setFormData({...formData, speaker: {...formData.speaker, image: e.target.value}})}
-                  placeholder="https://images.unsplash.com/..."
+                  type="file"
+                  accept="image/*"
+                  onChange={e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData({...formData, speaker: {...formData.speaker, image: reader.result}});
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  style={{ 
+                    background: '#1a1a1a', 
+                    border: '1px solid #333', 
+                    padding: '0.75rem',
+                    color: '#fff',
+                    width: '100%',
+                    cursor: 'pointer'
+                  }}
                 />
+                {formData.speaker.image && (
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <img 
+                      src={formData.speaker.image} 
+                      alt="Speaker preview" 
+                      style={{ 
+                        width: '80px', 
+                        height: '80px', 
+                        objectFit: 'cover', 
+                        borderRadius: '50%',
+                        border: '2px solid #F7D046'
+                      }} 
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="form-section-title">Additional Info</div>
