@@ -83,8 +83,8 @@ function Team() {
   useEffect(() => {
     window.scrollTo(0, 0)
     setTimeout(() => setLoaded(true), 100)
-    // Title animation completes after ~2s (matches CSS animation)
-    setTimeout(() => setTitleAnimationComplete(true), 2000)
+    // Title animation completes after ~2.5s (matches new slower animation)
+    setTimeout(() => setTitleAnimationComplete(true), 2500)
   }, [])
 
   // Cleanup hover timeout on unmount
@@ -251,7 +251,7 @@ function Team() {
                     <span
                       key={i}
                       className="char-animate"
-                      style={{ animationDelay: `${i * 0.05}s` }}
+                      style={{ animationDelay: `${0.3 + i * 0.08}s` }}
                     >
                       {char === ' ' ? '\u00A0' : char}
                     </span>
@@ -262,7 +262,7 @@ function Team() {
                     <span
                       key={i}
                       className="char-animate"
-                      style={{ animationDelay: `${0.4 + i * 0.05}s` }}
+                      style={{ animationDelay: `${1.0 + i * 0.08}s` }}
                     >
                       {char}
                     </span>
@@ -273,7 +273,7 @@ function Team() {
                     <span
                       key={i}
                       className="char-animate"
-                      style={{ animationDelay: `${0.9 + i * 0.05}s` }}
+                      style={{ animationDelay: `${1.8 + i * 0.08}s` }}
                     >
                       {char}
                     </span>

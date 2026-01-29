@@ -162,14 +162,15 @@
 .char-animate {
   display: inline-block;
   opacity: 0;
-  transform: translateY(30px);
-  animation: charReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: translateY(40px);
+  animation: charReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-fill-mode: both;
 }
 
 @keyframes charReveal {
   0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
   }
 
   100% {
