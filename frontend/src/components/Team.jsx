@@ -427,7 +427,7 @@ function Team() {
               onClick={() => handleCardClick(member, index)}
             >
               <div className="grid-card-image">
-                <img src={member.image} alt={member.name} />
+                <img src={member.image} alt={member.name} loading="lazy" />
                 <div className="grid-card-overlay">
                   <span className="view-text">View Profile</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

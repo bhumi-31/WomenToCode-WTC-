@@ -1,5 +1,7 @@
 /* Base Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -51,7 +53,8 @@ button {
   outline: none;
 }
 
-img, video {
+img,
+video {
   max-width: 100%;
   display: block;
 }
@@ -78,4 +81,55 @@ img, video {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #fae17a;
+}
+
+/* =========================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================= */
+
+/* CSS Containment for cards and sections - limits layout/paint recalculation */
+.event-card,
+.project-card,
+.stack-card,
+.grid-card,
+.article-card,
+.gallery-item {
+  contain: layout style;
+}
+
+/* will-change hints for frequently animated elements */
+.hero-btn,
+.nav-btn,
+.filter-tab,
+.filter-chip,
+.card-register-btn,
+.join-btn,
+.modal-link {
+  will-change: transform;
+}
+
+/* Smooth image loading - prevents layout shift */
+img[loading="lazy"] {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+}
+
+/* GPU acceleration for modals and overlays */
+.project-modal-backdrop,
+.member-expanded-overlay,
+.project-modal,
+.expanded-content {
+  will-change: opacity;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

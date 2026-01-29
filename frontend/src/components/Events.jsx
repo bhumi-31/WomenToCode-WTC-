@@ -11,12 +11,12 @@ const transformEvent = (event) => {
   if (event.date && event.month && event.speaker?.name) {
     return event;
   }
-  
+
   // Transform from old backend format to frontend format
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-  
+
   let eventDate = event.startDate ? new Date(event.startDate) : new Date();
-  
+
   return {
     ...event,
     id: event._id || event.id,
@@ -44,19 +44,19 @@ const SkeletonCard = ({ index }) => (
     <div className="event-card-speaker">
       <div className="card-speaker-img skeleton-item"><div className="skeleton-shimmer"></div></div>
       <div className="card-speaker-info">
-        <div className="skeleton-text skeleton-item" style={{width: '80px', height: '14px'}}><div className="skeleton-shimmer"></div></div>
-        <div className="skeleton-text skeleton-item" style={{width: '60px', height: '10px', marginTop: '5px'}}><div className="skeleton-shimmer"></div></div>
+        <div className="skeleton-text skeleton-item" style={{ width: '80px', height: '14px' }}><div className="skeleton-shimmer"></div></div>
+        <div className="skeleton-text skeleton-item" style={{ width: '60px', height: '10px', marginTop: '5px' }}><div className="skeleton-shimmer"></div></div>
       </div>
     </div>
     <div className="event-card-content">
-      <div className="skeleton-text skeleton-item" style={{width: '70px', height: '20px'}}><div className="skeleton-shimmer"></div></div>
-      <div className="skeleton-text skeleton-item" style={{width: '100%', height: '24px', marginTop: '10px'}}><div className="skeleton-shimmer"></div></div>
-      <div className="skeleton-text skeleton-item" style={{width: '100%', height: '40px', marginTop: '10px'}}><div className="skeleton-shimmer"></div></div>
-      <div className="card-meta" style={{marginTop: '15px'}}>
-        <div className="skeleton-text skeleton-item" style={{width: '80px', height: '14px'}}><div className="skeleton-shimmer"></div></div>
-        <div className="skeleton-text skeleton-item" style={{width: '100px', height: '14px'}}><div className="skeleton-shimmer"></div></div>
+      <div className="skeleton-text skeleton-item" style={{ width: '70px', height: '20px' }}><div className="skeleton-shimmer"></div></div>
+      <div className="skeleton-text skeleton-item" style={{ width: '100%', height: '24px', marginTop: '10px' }}><div className="skeleton-shimmer"></div></div>
+      <div className="skeleton-text skeleton-item" style={{ width: '100%', height: '40px', marginTop: '10px' }}><div className="skeleton-shimmer"></div></div>
+      <div className="card-meta" style={{ marginTop: '15px' }}>
+        <div className="skeleton-text skeleton-item" style={{ width: '80px', height: '14px' }}><div className="skeleton-shimmer"></div></div>
+        <div className="skeleton-text skeleton-item" style={{ width: '100px', height: '14px' }}><div className="skeleton-shimmer"></div></div>
       </div>
-      <div className="skeleton-text skeleton-item" style={{width: '100px', height: '36px', marginTop: '15px', borderRadius: '20px'}}><div className="skeleton-shimmer"></div></div>
+      <div className="skeleton-text skeleton-item" style={{ width: '100px', height: '36px', marginTop: '15px', borderRadius: '20px' }}><div className="skeleton-shimmer"></div></div>
     </div>
   </div>
 );
@@ -73,7 +73,7 @@ function Events() {
       try {
         const response = await fetch(`${API_URL}/events`);
         const data = await response.json();
-        
+
         if (data.success && Array.isArray(data.data) && data.data.length > 0) {
           // Transform events to match frontend format
           const transformedEvents = data.data.map(transformEvent);
@@ -88,7 +88,7 @@ function Events() {
         setLoading(false);
       }
     };
-    
+
     fetchEvents();
   }, []);
 
@@ -97,14 +97,14 @@ function Events() {
     setTimeout(() => setLoaded(true), 100)
   }, [])
 
-  const filteredEvents = filter === 'all' 
-    ? events 
+  const filteredEvents = filter === 'all'
+    ? events
     : events.filter(event => event.type?.toLowerCase().trim() === filter)
 
   return (
     <div className="events-page">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className={`events-hero ${loaded ? 'loaded' : ''}`}>
         <div className="events-hero-content">
@@ -124,25 +124,25 @@ function Events() {
       {/* Filter Tabs */}
       <section className="events-filter-section">
         <div className="filter-tabs">
-          <button 
+          <button
             className={`filter-tab ${filter === 'all' ? 'active' : ''}`}
             onClick={() => setFilter('all')}
           >
             All Events
           </button>
-          <button 
+          <button
             className={`filter-tab ${filter === 'workshop' ? 'active' : ''}`}
             onClick={() => setFilter('workshop')}
           >
             Workshops
           </button>
-          <button 
+          <button
             className={`filter-tab ${filter === 'talk' ? 'active' : ''}`}
             onClick={() => setFilter('talk')}
           >
             Talks
           </button>
-          <button 
+          <button
             className={`filter-tab ${filter === 'hackathon' ? 'active' : ''}`}
             onClick={() => setFilter('hackathon')}
           >
@@ -160,7 +160,7 @@ function Events() {
         ) : (
           <div className="events-grid">
             {filteredEvents.map((event, index) => (
-              <div 
+              <div
                 key={event._id || event.id}
                 className={`event-card ${loaded ? 'visible' : ''}`}
                 style={{ '--delay': `${index * 0.1}s` }}
@@ -173,10 +173,11 @@ function Events() {
 
                 {/* Speaker */}
                 <div className="event-card-speaker">
-                  <img 
-                    src={event.speaker?.image || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face'} 
+                  <img
+                    src={event.speaker?.image || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face'}
                     alt={event.speaker?.name || 'Speaker'}
                     className="card-speaker-img"
+                    loading="lazy"
                   />
                   <div className="card-speaker-info">
                     <h4>{event.speaker?.name || 'TBA'}</h4>
@@ -189,7 +190,7 @@ function Events() {
                   <span className="card-type">{event.type}</span>
                   <h3 className="card-title">{event.title}</h3>
                   <p className="card-description">{event.description}</p>
-                  
+
                   <div className="card-meta">
                     <span>📍 {event.location}</span>
                     <span>⏱ {event.time}</span>
