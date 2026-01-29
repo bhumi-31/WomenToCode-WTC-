@@ -10,12 +10,12 @@ const transformEvent = (event) => {
   if (event.date && event.month && event.speaker?.name) {
     return event;
   }
-  
+
   // Transform from old backend format to frontend format
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-  
+
   let eventDate = event.startDate ? new Date(event.startDate) : new Date();
-  
+
   return {
     ...event,
     id: event._id || event.id,
@@ -42,6 +42,27 @@ function EventsPreview() {
   const [isLoading, setIsLoading] = useState(true)
   const sectionRef = useRef(null)
 
+  // Helper function to parse event date for sorting
+  const parseEventDate = (event) => {
+    const months = {
+      'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+      'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+    };
+    const year = parseInt(event.year) || new Date().getFullYear();
+    const month = months[event.month?.toUpperCase()] ?? 0;
+    const day = parseInt(event.date) || 1;
+    return new Date(year, month, day);
+  };
+
+  // Sort events by date (nearest first)
+  const sortEventsByDate = (eventsToSort) => {
+    return [...eventsToSort].sort((a, b) => {
+      const dateA = parseEventDate(a);
+      const dateB = parseEventDate(b);
+      return dateA - dateB; // Ascending order (nearest date first)
+    });
+  };
+
   // Fetch events from API
   useEffect(() => {
     const fetchEvents = async () => {
@@ -49,13 +70,15 @@ function EventsPreview() {
         setIsLoading(true);
         const response = await fetch(`${API_URL}/events`);
         const data = await response.json();
-        
+
         if (data.success && Array.isArray(data.data) && data.data.length > 0) {
           const transformedEvents = data.data.map(transformEvent);
-          setEvents(transformedEvents);
+          const sortedEvents = sortEventsByDate(transformedEvents);
+          setEvents(sortedEvents);
         } else if (Array.isArray(data) && data.length > 0) {
           const transformedEvents = data.map(transformEvent);
-          setEvents(transformedEvents);
+          const sortedEvents = sortEventsByDate(transformedEvents);
+          setEvents(sortedEvents);
         }
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -63,7 +86,7 @@ function EventsPreview() {
         setIsLoading(false);
       }
     };
-    
+
     fetchEvents();
   }, []);
 
@@ -116,8 +139,8 @@ function EventsPreview() {
           <div className="events-header">
             <h2 className="events-tag">
               {'UPCOMING EVENTS'.split('').map((char, index) => (
-                <span 
-                  key={index} 
+                <span
+                  key={index}
                   className="char animate"
                   style={{ '--char-index': index }}
                 >
@@ -126,33 +149,33 @@ function EventsPreview() {
               ))}
             </h2>
           </div>
-          
+
           {/* Loading Skeleton */}
           <div className="event-showcase animate-in" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ 
-                width: '120px', 
-                height: '120px', 
-                borderRadius: '50%', 
-                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)', 
-                backgroundSize: '200% 100%', 
+              <div style={{
+                width: '120px',
+                height: '120px',
+                borderRadius: '50%',
+                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)',
+                backgroundSize: '200% 100%',
                 animation: 'shimmer 1.5s infinite',
                 margin: '0 auto 1.5rem'
               }}></div>
-              <div style={{ 
-                width: '200px', 
-                height: '24px', 
-                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)', 
-                backgroundSize: '200% 100%', 
+              <div style={{
+                width: '200px',
+                height: '24px',
+                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)',
+                backgroundSize: '200% 100%',
                 animation: 'shimmer 1.5s infinite',
                 borderRadius: '4px',
                 margin: '0 auto 0.75rem'
               }}></div>
-              <div style={{ 
-                width: '150px', 
-                height: '16px', 
-                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)', 
-                backgroundSize: '200% 100%', 
+              <div style={{
+                width: '150px',
+                height: '16px',
+                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)',
+                backgroundSize: '200% 100%',
                 animation: 'shimmer 1.5s infinite',
                 borderRadius: '4px',
                 margin: '0 auto'
@@ -160,7 +183,7 @@ function EventsPreview() {
             </div>
           </div>
         </div>
-        
+
         <style>{`
           @keyframes shimmer {
             0% { background-position: 200% 0; }
@@ -172,8 +195,8 @@ function EventsPreview() {
   }
 
   return (
-    <section 
-      id="events" 
+    <section
+      id="events"
       className={`events-preview ${isVisible ? 'visible' : ''}`}
       ref={sectionRef}
     >
@@ -182,8 +205,8 @@ function EventsPreview() {
         <div className="events-header">
           <h2 className="events-tag">
             {'UPCOMING EVENTS'.split('').map((char, index) => (
-              <span 
-                key={index} 
+              <span
+                key={index}
                 className={`char ${isVisible ? 'animate' : ''}`}
                 style={{ '--char-index': index }}
               >
@@ -192,15 +215,15 @@ function EventsPreview() {
             ))}
           </h2>
           <div className={`events-nav-arrows ${isVisible ? 'animate-in' : ''}`}>
-            <button 
-              className="nav-arrow prev" 
+            <button
+              className="nav-arrow prev"
               onClick={handlePrev}
               aria-label="Previous event"
             >
               ←
             </button>
-            <button 
-              className="nav-arrow next" 
+            <button
+              className="nav-arrow next"
               onClick={handleNext}
               aria-label="Next event"
             >
@@ -221,8 +244,8 @@ function EventsPreview() {
           <div className={`event-content ${isAnimating ? 'animating' : ''}`}>
             {/* Speaker Image */}
             <div className={`speaker-image-wrapper ${isVisible ? 'animate-in' : ''}`}>
-              <img 
-                src={activeEvent.speaker?.image || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face'} 
+              <img
+                src={activeEvent.speaker?.image || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face'}
                 alt={activeEvent.speaker?.name || 'Speaker'}
                 className="speaker-image"
               />
