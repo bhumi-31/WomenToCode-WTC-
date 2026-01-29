@@ -19,7 +19,11 @@ const membershipRoutes = require('./routes/membershipRoutes');
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    'https://womentocode-wtc.vercel.app',
+    'https://womentocode-wtc.onrender.com'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));   

@@ -14,6 +14,9 @@ const Event = require('../models/Event');
 // @access  Public
 exports.getAllEvents = async (req, res) => {
   try {
+    // Disable caching
+    res.setHeader('Cache-Control', 'no-store');
+    
     const { type, status, featured, isOnline } = req.query;
     
     // Build filter - show active events only
