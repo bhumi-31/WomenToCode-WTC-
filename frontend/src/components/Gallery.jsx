@@ -13,55 +13,92 @@ const chunkArray = (arr, size) => {
   return chunks;
 };
 
-// Component for a single Bento Row - Clean fade-in
-const BentoRow = ({ images, rowIndex }) => {
-  // Get image URL safely
+// Typewriter Text Component
+const TypewriterText = ({ text, delay = 0, speed = 50, onComplete }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [started, setStarted] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    const startTimer = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(startTimer);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, speed);
+      return () => clearTimeout(timer);
+    } else {
+      setDone(true);
+      if (onComplete) onComplete();
+    }
+  }, [currentIndex, text, speed, started, onComplete]);
+
+  return <>{displayedText}{!done && <span className="typewriter-cursor">|</span>}</>;
+};
+
+// Skeleton Bento Grid
+const SkeletonBento = () => (
+  <div className="gallery-grid skeleton-grid visible">
+    <div className="gallery-item main-image skeleton-item"><div className="skeleton-shimmer"></div></div>
+    <div className="gallery-item left-top skeleton-item"><div className="skeleton-shimmer"></div></div>
+    <div className="gallery-item left-bottom skeleton-item"><div className="skeleton-shimmer"></div></div>
+    <div className="gallery-item right-top skeleton-item"><div className="skeleton-shimmer"></div></div>
+    <div className="gallery-item right-bottom skeleton-item"><div className="skeleton-shimmer"></div></div>
+    <div className="gallery-item bottom-left skeleton-item"><div className="skeleton-shimmer"></div></div>
+    <div className="gallery-item bottom-right skeleton-item"><div className="skeleton-shimmer"></div></div>
+  </div>
+);
+
+// Component for a single Bento Row
+const BentoRow = ({ images, rowIndex, showImages }) => {
   const getImageUrl = (img) => img?.image || img?.src || '';
   const getImageAlt = (img) => img?.title || img?.alt || 'Gallery image';
 
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="gallery-grid fade-in" style={{ animationDelay: `${rowIndex * 0.1}s` }}>
-      {/* Main Center Image */}
+    <div 
+      className={`gallery-grid ${showImages ? 'visible' : ''}`}
+      style={{ animationDelay: `${rowIndex * 0.15}s` }}
+    >
       {images[0] && (
-        <div className="gallery-item main-image">
+        <div className="gallery-item main-image" style={{animationDelay: `${rowIndex * 0.15}s`}}>
           <img src={getImageUrl(images[0])} alt={getImageAlt(images[0])} loading="eager" />
         </div>
       )}
-
-      {/* Left Column */}
       {images[1] && (
-        <div className="gallery-item left-top">
+        <div className="gallery-item left-top" style={{animationDelay: `${rowIndex * 0.15 + 0.05}s`}}>
           <img src={getImageUrl(images[1])} alt={getImageAlt(images[1])} loading="eager" />
         </div>
       )}
       {images[2] && (
-        <div className="gallery-item left-bottom">
+        <div className="gallery-item left-bottom" style={{animationDelay: `${rowIndex * 0.15 + 0.1}s`}}>
           <img src={getImageUrl(images[2])} alt={getImageAlt(images[2])} loading="eager" />
         </div>
       )}
-
-      {/* Right Column */}
       {images[3] && (
-        <div className="gallery-item right-top">
+        <div className="gallery-item right-top" style={{animationDelay: `${rowIndex * 0.15 + 0.05}s`}}>
           <img src={getImageUrl(images[3])} alt={getImageAlt(images[3])} loading="eager" />
         </div>
       )}
       {images[4] && (
-        <div className="gallery-item right-bottom">
+        <div className="gallery-item right-bottom" style={{animationDelay: `${rowIndex * 0.15 + 0.1}s`}}>
           <img src={getImageUrl(images[4])} alt={getImageAlt(images[4])} loading="eager" />
         </div>
       )}
-
-      {/* Bottom Row */}
       {images[5] && (
-        <div className="gallery-item bottom-left">
+        <div className="gallery-item bottom-left" style={{animationDelay: `${rowIndex * 0.15 + 0.15}s`}}>
           <img src={getImageUrl(images[5])} alt={getImageAlt(images[5])} loading="lazy" />
         </div>
       )}
       {images[6] && (
-        <div className="gallery-item bottom-right">
+        <div className="gallery-item bottom-right" style={{animationDelay: `${rowIndex * 0.15 + 0.15}s`}}>
           <img src={getImageUrl(images[6])} alt={getImageAlt(images[6])} loading="lazy" />
         </div>
       )}
@@ -72,7 +109,9 @@ const BentoRow = ({ images, rowIndex }) => {
 const Gallery = () => {
   const [galleryImages, setGalleryImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [headingComplete, setHeadingComplete] = useState(false);
+  const [showImages, setShowImages] = useState(false);
+  const [line1Done, setLine1Done] = useState(false);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -87,64 +126,69 @@ const Gallery = () => {
         console.error('Error fetching gallery:', error);
       } finally {
         setIsLoading(false);
-        // Trigger fade-in after images loaded
-        setTimeout(() => setIsLoaded(true), 50);
       }
     };
     fetchImages();
   }, []);
 
-  // Split images into rows of 7
-  const imageRows = chunkArray(galleryImages, 7);
+  // Show images after heading is complete
+  useEffect(() => {
+    if (headingComplete) {
+      const timer = setTimeout(() => setShowImages(true), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [headingComplete]);
 
-  // Skeleton for loading state
-  const SkeletonGrid = () => (
-    <div className="gallery-grid skeleton-grid">
-      <div className="gallery-item main-image skeleton-item"><div className="skeleton-shimmer"></div></div>
-      <div className="gallery-item left-top skeleton-item"><div className="skeleton-shimmer"></div></div>
-      <div className="gallery-item left-bottom skeleton-item"><div className="skeleton-shimmer"></div></div>
-      <div className="gallery-item right-top skeleton-item"><div className="skeleton-shimmer"></div></div>
-      <div className="gallery-item right-bottom skeleton-item"><div className="skeleton-shimmer"></div></div>
-      <div className="gallery-item bottom-left skeleton-item"><div className="skeleton-shimmer"></div></div>
-      <div className="gallery-item bottom-right skeleton-item"><div className="skeleton-shimmer"></div></div>
-    </div>
-  );
+  const imageRows = chunkArray(galleryImages, 7);
 
   return (
     <section className="gallery-section">
       <Navbar />
 
       <div className="gallery-container">
-        {/* Header */}
-        <div className={`gallery-header ${isLoaded ? 'visible' : ''}`}>
+        {/* Header with Typewriter */}
+        <div className="gallery-header visible">
           <span className="gallery-label">── OUR GALLERY</span>
           <h1 className="gallery-title">
-            <span className="title-line">MOMENTS OF</span>
-            <span className="title-line highlight">EMPOWERMENT</span>
+            <span className="title-line">
+              <TypewriterText 
+                text="MOMENTS OF" 
+                delay={300} 
+                speed={60} 
+                onComplete={() => setLine1Done(true)}
+              />
+            </span>
+            {line1Done && (
+              <span className="title-line highlight">
+                <TypewriterText 
+                  text="EMPOWERMENT" 
+                  delay={100} 
+                  speed={50} 
+                  onComplete={() => setHeadingComplete(true)}
+                />
+              </span>
+            )}
           </h1>
         </div>
 
-        {/* Loading Skeleton or Images */}
-        {isLoading ? (
-          <SkeletonGrid />
-        ) : galleryImages.length === 0 ? (
-          <div className="gallery-empty">
-            <p>No images yet. Add some from Admin Dashboard!</p>
-          </div>
-        ) : (
-          /* Bento Grid Rows */
+        {/* Skeleton while loading or waiting for heading */}
+        {(!showImages || isLoading) && <SkeletonBento />}
+
+        {/* Images after heading complete and loaded */}
+        {showImages && !isLoading && galleryImages.length > 0 && (
           imageRows.map((rowImages, index) => (
             <BentoRow 
               key={index}
               images={rowImages}
               rowIndex={index}
+              showImages={showImages}
             />
           ))
         )}
 
         {/* Image Count */}
-        {!isLoading && galleryImages.length > 0 && (
-          <div className={`gallery-count ${isLoaded ? 'visible' : ''}`}>
+        {showImages && !isLoading && galleryImages.length > 0 && (
+          <div className="gallery-count">
             <span>{galleryImages.length} MOMENTS CAPTURED</span>
           </div>
         )}
