@@ -353,8 +353,65 @@ const sendPasswordResetSuccessEmail = async (email, firstName) => {
   }
 };
 
+// Membership Reply Email Content
+const getMembershipReplyContent = (name, message) => {
+  return `
+    <!-- Message Icon -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div style="display: inline-block; width: 80px; height: 80px; background: linear-gradient(135deg, rgba(247, 208, 70, 0.2) 0%, rgba(247, 208, 70, 0.1) 100%); border-radius: 50%; padding-top: 18px; box-sizing: border-box;">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z" fill="#F7D046"/>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Greeting -->
+    <h2 style="margin: 0 0 20px 0; color: #ffffff; font-size: 28px; font-weight: 600; text-align: center;">
+      Hello, <span style="color: #F7D046;">${name}!</span>
+    </h2>
+    
+    <!-- Divider -->
+    <div style="height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(247, 208, 70, 0.3) 50%, transparent 100%); margin: 25px 0;"></div>
+    
+    <!-- Message -->
+    <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 25px; margin: 20px 0;">
+      <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 15px; line-height: 1.8; white-space: pre-wrap;">
+        ${message}
+      </p>
+    </div>
+    
+    <!-- Signature -->
+    <p style="margin: 30px 0 0 0; color: rgba(255, 255, 255, 0.5); font-size: 14px; text-align: center; font-style: italic;">
+      Best regards,<br>
+      <span style="color: rgba(255, 255, 255, 0.7);">The WomenToCode Team</span>
+    </p>
+  `;
+};
+
+// Send Membership Reply Email
+const sendMembershipReply = async (email, name, subject, message) => {
+  try {
+    const transporter = createTransporter();
+    
+    const mailOptions = {
+      from: `"WomenToCode" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: subject,
+      html: getEmailTemplate(getMembershipReplyContent(name, message))
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(`Membership reply email sent to ${email}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending membership reply email:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendPasswordResetEmail,
-  sendPasswordResetSuccessEmail
+  sendPasswordResetSuccessEmail,
+  sendMembershipReply
 };

@@ -99,7 +99,7 @@ const Signup = () => {
           <div className="brand-divider"></div>
           
           <p className="brand-tagline">
-            Building a community of <span className="highlight">5000+</span> women in tech
+            Empowering women to lead in tech
           </p>
 
           <div className="code-animation">
@@ -123,21 +123,6 @@ const Signup = () => {
             </div>
             <div className="code-line">
               {'}'}
-            </div>
-          </div>
-
-          <div className="stats-grid">
-            <div className="stat-item">
-              <span className="stat-number">5000+</span>
-              <span className="stat-label">Women Trained</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">150+</span>
-              <span className="stat-label">Events Hosted</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">50+</span>
-              <span className="stat-label">Companies Hiring</span>
             </div>
           </div>
         </div>

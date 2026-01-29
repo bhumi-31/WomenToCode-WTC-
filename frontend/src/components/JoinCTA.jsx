@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import './JoinCTA.css'
 
 function JoinCTA() {
@@ -56,10 +57,10 @@ function JoinCTA() {
         </p>
 
         {/* CTA Button */}
-        <a href="#" className="join-btn">
+        <Link to="/join" className="join-btn">
           <span className="btn-icon">✦</span>
           <span>BECOME A MEMBER</span>
-        </a>
+        </Link>
 
       </div>
     </section>

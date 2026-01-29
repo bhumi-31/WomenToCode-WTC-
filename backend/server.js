@@ -14,6 +14,7 @@ const galleryRoutes = require('./routes/galleryRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const articleRoutes = require('./routes/articleRoutes');
+const membershipRoutes = require('./routes/membershipRoutes');
 
 const app = express();
 
@@ -79,6 +80,9 @@ app.use('/announcements', announcementRoutes);
 
 // Mount article routes at /articles
 app.use('/articles', articleRoutes);
+
+// Mount membership routes at /membership
+app.use('/membership', membershipRoutes);
 
 // ------------------------------------------
 // STEP 5: 404 Handler (Route not found)

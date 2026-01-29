@@ -36,7 +36,7 @@ function Navbar() {
 
   const handleJoinClick = (e) => {
     e.preventDefault()
-    navigate('/signup')
+    navigate('/join')
   }
 
   return (

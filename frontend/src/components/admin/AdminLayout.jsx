@@ -46,6 +46,7 @@ const AdminLayout = () => {
     { path: '/admin', label: 'OVERVIEW', exact: true },
     { path: '/admin/users', label: 'USERS' },
     { path: '/admin/messages', label: 'MESSAGES' },
+    { path: '/admin/membership', label: 'MEMBERSHIP' },
     { path: '/admin/team', label: 'TEAM' },
     { path: '/admin/events', label: 'EVENTS' },
     { path: '/admin/projects', label: 'PROJECTS' },
