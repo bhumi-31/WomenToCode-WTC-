@@ -52,7 +52,7 @@ const Articles = () => {
       }
     };
     fetchArticles();
-  }, [];
+  }, []);
 
   // Character animation
   useEffect(() => {
