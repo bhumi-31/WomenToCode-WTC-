@@ -107,7 +107,69 @@ function EventsPreview() {
 
   const activeEvent = events[activeIndex] || events[0]
 
-  if (!activeEvent) return null;
+  // Show loading skeleton while events are being fetched
+  if (isLoading || !activeEvent) {
+    return (
+      <section id="events" className="events-preview visible" ref={sectionRef}>
+        <div className="events-container animate-in">
+          {/* Header */}
+          <div className="events-header">
+            <h2 className="events-tag">
+              {'UPCOMING EVENTS'.split('').map((char, index) => (
+                <span 
+                  key={index} 
+                  className="char animate"
+                  style={{ '--char-index': index }}
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </h2>
+          </div>
+          
+          {/* Loading Skeleton */}
+          <div className="event-showcase animate-in" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                width: '120px', 
+                height: '120px', 
+                borderRadius: '50%', 
+                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)', 
+                backgroundSize: '200% 100%', 
+                animation: 'shimmer 1.5s infinite',
+                margin: '0 auto 1.5rem'
+              }}></div>
+              <div style={{ 
+                width: '200px', 
+                height: '24px', 
+                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)', 
+                backgroundSize: '200% 100%', 
+                animation: 'shimmer 1.5s infinite',
+                borderRadius: '4px',
+                margin: '0 auto 0.75rem'
+              }}></div>
+              <div style={{ 
+                width: '150px', 
+                height: '16px', 
+                background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)', 
+                backgroundSize: '200% 100%', 
+                animation: 'shimmer 1.5s infinite',
+                borderRadius: '4px',
+                margin: '0 auto'
+              }}></div>
+            </div>
+          </div>
+        </div>
+        
+        <style>{`
+          @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        `}</style>
+      </section>
+    );
+  }
 
   return (
     <section 
