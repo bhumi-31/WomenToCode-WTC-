@@ -482,38 +482,81 @@ function Team() {
           )}
 
           {/* Team Grid (Alternative View for Mobile/Full List) */}
+          {/* Advisory Section */}
+          {teamMembers.filter(m => m.role?.toUpperCase() === 'ADVISOR').length > 0 && (
+            <section className="team-advisory-section">
+              <div className="grid-header">
+                <h2>Advisory</h2>
+                <p>Our guiding mentors and advisors</p>
+              </div>
+              <div className="team-grid advisory-grid">
+                {teamMembers
+                  .filter(member => member.role?.toUpperCase() === 'ADVISOR')
+                  .map((member, index) => (
+                    <div
+                      key={member.id}
+                      className={`grid-card ${loaded ? 'visible' : ''}`}
+                      style={{
+                        '--delay': `${(index % 8) * 0.05}s`,
+                        '--member-color': member.color
+                      }}
+                      onClick={() => handleCardClick(member, index)}
+                    >
+                      <div className="grid-card-image">
+                        <img src={member.image} alt={member.name} loading="lazy" />
+                        <div className="grid-card-overlay">
+                          <span className="view-text">View Profile</span>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="grid-card-info">
+                        <h4>{member.name}</h4>
+                        <span>{member.role}</span>
+                      </div>
+                      <div className="grid-card-accent" />
+                    </div>
+                  ))}
+              </div>
+            </section>
+          )}
+
+          {/* All Team Members Grid */}
           <section className="team-full-grid">
             <div className="grid-header">
               <h2>All Team Members</h2>
               <p>Click on any card to learn more</p>
             </div>
             <div className="team-grid">
-              {teamMembers.map((member, index) => (
-                <div
-                  key={member.id}
-                  className={`grid-card ${loaded ? 'visible' : ''}`}
-                  style={{
-                    '--delay': `${(index % 8) * 0.05}s`,
-                    '--member-color': member.color
-                  }}
-                  onClick={() => handleCardClick(member, index)}
-                >
-                  <div className="grid-card-image">
-                    <img src={member.image} alt={member.name} loading="lazy" />
-                    <div className="grid-card-overlay">
-                      <span className="view-text">View Profile</span>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M7 17L17 7M17 7H7M17 7V17" />
-                      </svg>
+              {teamMembers
+                .filter(member => member.role?.toUpperCase() !== 'ADVISOR')
+                .map((member, index) => (
+                  <div
+                    key={member.id}
+                    className={`grid-card ${loaded ? 'visible' : ''}`}
+                    style={{
+                      '--delay': `${(index % 8) * 0.05}s`,
+                      '--member-color': member.color
+                    }}
+                    onClick={() => handleCardClick(member, index)}
+                  >
+                    <div className="grid-card-image">
+                      <img src={member.image} alt={member.name} loading="lazy" />
+                      <div className="grid-card-overlay">
+                        <span className="view-text">View Profile</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M7 17L17 7M17 7H7M17 7V17" />
+                        </svg>
+                      </div>
                     </div>
+                    <div className="grid-card-info">
+                      <h4>{member.name}</h4>
+                      <span>{member.role}</span>
+                    </div>
+                    <div className="grid-card-accent" />
                   </div>
-                  <div className="grid-card-info">
-                    <h4>{member.name}</h4>
-                    <span>{member.role}</span>
-                  </div>
-                  <div className="grid-card-accent" />
-                </div>
-              ))}
+                ))}
             </div>
           </section>
 

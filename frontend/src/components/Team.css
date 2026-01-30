@@ -825,6 +825,36 @@
 }
 
 /* ============================================
+   ADVISORY SECTION
+   ============================================ */
+.team-advisory-section {
+  padding: 80px 5%;
+  background: linear-gradient(to bottom, #0a0a0a, #0f0f12);
+  border-bottom: 1px solid rgba(247, 208, 70, 0.2);
+}
+
+.team-advisory-section .grid-header h2 {
+  color: var(--color-accent);
+}
+
+.team-advisory-section .grid-header p {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.advisory-grid {
+  max-width: 900px;
+  justify-content: center;
+}
+
+.advisory-grid .grid-card {
+  border: 1px solid rgba(247, 208, 70, 0.2);
+}
+
+.advisory-grid .grid-card:hover {
+  border-color: var(--color-accent);
+}
+
+/* ============================================
    TEAM FULL GRID SECTION
    ============================================ */
 .team-full-grid {
