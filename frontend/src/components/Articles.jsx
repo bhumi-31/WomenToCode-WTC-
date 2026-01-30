@@ -1,10 +1,37 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import './Articles.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const categories = ['All', 'Career', 'Tech', 'Community', 'Leadership', 'Tutorial'];
+
+// TypewriterText Component
+const TypewriterText = ({ text, delay = 0, speed = 80, onComplete }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const startTimer = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(startTimer);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, speed);
+      return () => clearTimeout(timer);
+    } else {
+      if (onComplete) onComplete();
+    }
+  }, [currentIndex, text, speed, started, onComplete]);
+
+  return <>{displayedText}</>;
+};
 
 // Skeleton Article Card
 const SkeletonCard = ({ index }) => (
@@ -35,12 +62,8 @@ const Articles = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [visibleChars, setVisibleChars] = useState({ line1: 0, line2: 0 });
+  const [line1Done, setLine1Done] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const animationStarted = useRef(false);
-
-  const line1 = "INSIGHTS &";
-  const line2 = "STORIES";
 
   // Fetch articles from backend
   useEffect(() => {
@@ -78,41 +101,6 @@ const Articles = () => {
     fetchArticles();
   }, []);
 
-  // Character animation
-  useEffect(() => {
-    if (animationStarted.current) return;
-    animationStarted.current = true;
-
-    let charIndex = 0;
-
-    // Start animation after 500ms delay
-    setTimeout(() => {
-      const animateLine1 = setInterval(() => {
-        if (charIndex < line1.length) {
-          setVisibleChars(prev => ({ ...prev, line1: charIndex + 1 }));
-          charIndex++;
-        } else {
-          clearInterval(animateLine1);
-          charIndex = 0;
-
-          setTimeout(() => {
-            const animateLine2 = setInterval(() => {
-              if (charIndex < line2.length) {
-                setVisibleChars(prev => ({ ...prev, line2: charIndex + 1 }));
-                charIndex++;
-              } else {
-                clearInterval(animateLine2);
-                setTimeout(() => setIsVisible(true), 300);
-              }
-            }, 100);
-          }, 200);
-        }
-      }, 100);
-    }, 500);
-
-    return () => { };
-  }, []);
-
   useEffect(() => {
     if (activeCategory === 'All') {
       setFilteredArticles(articles);
@@ -131,32 +119,32 @@ const Articles = () => {
         {/* Header */}
         <div className="articles-header">
           <div className="articles-header-left">
-            <span className={`articles-label ${visibleChars.line1 > 0 ? 'visible' : ''}`}>── FROM OUR MEDIUM</span>
+            <span className="articles-label visible">── FROM OUR MEDIUM</span>
             <h1 className="articles-title">
               <span className="title-line">
-                {line1.split('').map((char, i) => (
-                  <span
-                    key={i}
-                    className={`char-animate ${i < visibleChars.line1 ? 'visible' : ''}`}
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
+                <TypewriterText
+                  text="INSIGHTS &"
+                  delay={300}
+                  speed={80}
+                  onComplete={() => setLine1Done(true)}
+                />
               </span>
-              <span className="title-line highlight">
-                {line2.split('').map((char, i) => (
-                  <span
-                    key={i}
-                    className={`char-animate highlight-char ${i < visibleChars.line2 ? 'visible' : ''}`}
-                  >
-                    {char}
-                  </span>
-                ))}
-              </span>
+              {line1Done && (
+                <span className="title-line highlight">
+                  <TypewriterText
+                    text="STORIES"
+                    delay={100}
+                    speed={80}
+                    onComplete={() => setIsVisible(true)}
+                  />
+                </span>
+              )}
             </h1>
-            <p className={`articles-stats ${isVisible && !isLoading ? 'visible' : ''}`}>
-              {isLoading ? '' : `${totalArticles} articles by our community`}
-            </p>
+            {isVisible && (
+              <p className="articles-stats visible">
+                {isLoading ? '' : `${totalArticles} articles by our community`}
+              </p>
+            )}
           </div>
 
           <div className={`articles-header-right ${isVisible ? 'visible' : ''}`}>

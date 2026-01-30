@@ -6,6 +6,33 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const categories = ['All', 'Web Development', 'Mobile', 'Data Science', 'AI/ML', 'Design'];
 
+// TypewriterText Component - types character by character
+const TypewriterText = ({ text, delay = 0, speed = 80, onComplete }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const startTimer = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(startTimer);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, speed);
+      return () => clearTimeout(timer);
+    } else {
+      if (onComplete) onComplete();
+    }
+  }, [currentIndex, text, speed, started, onComplete]);
+
+  return <>{displayedText}</>;
+};
+
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -15,12 +42,8 @@ const Projects = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [visibleChars, setVisibleChars] = useState({ line1: 0, line2: 0, line3: 0 });
-  const animationStarted = useRef(false);
-
-  const line1 = "WOMEN";
-  const line2 = "BUILDING THE";
-  const line3 = "FUTURE";
+  const [line1Done, setLine1Done] = useState(false);
+  const [line2Done, setLine2Done] = useState(false);
 
   // Fetch projects from API
   useEffect(() => {
@@ -52,56 +75,6 @@ const Projects = () => {
     };
 
     fetchProjects();
-  }, []);
-
-  // Character by character animation for heading
-  useEffect(() => {
-    if (animationStarted.current) return;
-    animationStarted.current = true;
-
-    let charIndex = 0;
-
-    // Start animation after 500ms delay
-    setTimeout(() => {
-      // Animate line 1
-      const animateLine1 = setInterval(() => {
-        if (charIndex < line1.length) {
-          setVisibleChars(prev => ({ ...prev, line1: charIndex + 1 }));
-          charIndex++;
-        } else {
-          clearInterval(animateLine1);
-          charIndex = 0;
-
-          // Animate line 2
-          setTimeout(() => {
-            const animateLine2 = setInterval(() => {
-              if (charIndex < line2.length) {
-                setVisibleChars(prev => ({ ...prev, line2: charIndex + 1 }));
-                charIndex++;
-              } else {
-                clearInterval(animateLine2);
-                charIndex = 0;
-
-                // Animate line 3
-                setTimeout(() => {
-                  const animateLine3 = setInterval(() => {
-                    if (charIndex < line3.length) {
-                      setVisibleChars(prev => ({ ...prev, line3: charIndex + 1 }));
-                      charIndex++;
-                    } else {
-                      clearInterval(animateLine3);
-                      setTimeout(() => setIsVisible(true), 300);
-                    }
-                  }, 100);
-                }, 200);
-              }
-            }, 100);
-          }, 200);
-        }
-      }, 100);
-    }, 500);
-
-    return () => { };
   }, []);
 
   // Filter projects based on category and search
@@ -210,42 +183,42 @@ const Projects = () => {
         {/* Header */}
         <div className="projects-header">
           <div className="projects-header-left">
-            <span className={`projects-label ${visibleChars.line1 > 0 ? 'visible' : ''}`}>── OUR PROJECTS</span>
+            <span className="projects-label visible">── OUR PROJECTS</span>
             <h1 className="projects-title">
               <span className="title-line">
-                {line1.split('').map((char, i) => (
-                  <span
-                    key={i}
-                    className={`char-animate ${i < visibleChars.line1 ? 'visible' : ''}`}
-                  >
-                    {char}
-                  </span>
-                ))}
+                <TypewriterText
+                  text="WOMEN"
+                  delay={300}
+                  speed={80}
+                  onComplete={() => setLine1Done(true)}
+                />
               </span>
-              <span className="title-line">
-                {line2.split('').map((char, i) => (
-                  <span
-                    key={i}
-                    className={`char-animate ${i < visibleChars.line2 ? 'visible' : ''}`}
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-              </span>
-              <span className="title-line highlight">
-                {line3.split('').map((char, i) => (
-                  <span
-                    key={i}
-                    className={`char-animate highlight-char ${i < visibleChars.line3 ? 'visible' : ''}`}
-                  >
-                    {char}
-                  </span>
-                ))}
-              </span>
+              {line1Done && (
+                <span className="title-line">
+                  <TypewriterText
+                    text="BUILDING THE"
+                    delay={100}
+                    speed={70}
+                    onComplete={() => setLine2Done(true)}
+                  />
+                </span>
+              )}
+              {line2Done && (
+                <span className="title-line highlight">
+                  <TypewriterText
+                    text="FUTURE"
+                    delay={100}
+                    speed={80}
+                    onComplete={() => setIsVisible(true)}
+                  />
+                </span>
+              )}
             </h1>
-            <p className={`projects-stats ${isVisible ? 'visible' : ''}`}>
-              {totalProjects} projects by {uniqueCreators} incredible women
-            </p>
+            {isVisible && (
+              <p className="projects-stats visible">
+                {totalProjects} projects by {uniqueCreators} incredible women
+              </p>
+            )}
           </div>
 
           <div className={`projects-header-right ${isVisible ? 'visible' : ''}`}>

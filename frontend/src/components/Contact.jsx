@@ -1,9 +1,36 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from './Navbar'
 import './Contact.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
+// TypewriterText Component
+const TypewriterText = ({ text, delay = 0, speed = 80, onComplete }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const startTimer = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(startTimer);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, speed);
+      return () => clearTimeout(timer);
+    } else {
+      if (onComplete) onComplete();
+    }
+  }, [currentIndex, text, speed, started, onComplete]);
+
+  return <>{displayedText}</>;
+};
 
 function Contact() {
   const [loaded, setLoaded] = useState(false)
@@ -18,44 +45,11 @@ function Contact() {
   const [submitted, setSubmitted] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [activeAccordion, setActiveAccordion] = useState(null)
-  const [visibleChars, setVisibleChars] = useState({ line1: 0, line2: 0 })
-  const animationStarted = useRef(false)
-
-  const line1 = "LET'S BUILD THE"
-  const line2 = "FUTURE TOGETHER"
+  const [line1Done, setLine1Done] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
     setTimeout(() => setLoaded(true), 100)
-
-    // Character animation
-    if (animationStarted.current) return;
-    animationStarted.current = true;
-
-    let charIndex = 0;
-
-    setTimeout(() => {
-      const animateLine1 = setInterval(() => {
-        if (charIndex < line1.length) {
-          setVisibleChars(prev => ({ ...prev, line1: charIndex + 1 }));
-          charIndex++;
-        } else {
-          clearInterval(animateLine1);
-          charIndex = 0;
-
-          setTimeout(() => {
-            const animateLine2 = setInterval(() => {
-              if (charIndex < line2.length) {
-                setVisibleChars(prev => ({ ...prev, line2: charIndex + 1 }));
-                charIndex++;
-              } else {
-                clearInterval(animateLine2);
-              }
-            }, 100);
-          }, 200);
-        }
-      }, 100);
-    }, 500);
   }, [])
 
   const handleChange = (e) => {
@@ -209,25 +203,22 @@ function Contact() {
           <span className="contact-badge">✦ GET IN TOUCH</span>
           <h1 className="contact-title">
             <span className="line">
-              {line1.split('').map((char, i) => (
-                <span
-                  key={i}
-                  className={`char-animate ${i < visibleChars.line1 ? 'visible' : ''}`}
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </span>
-              ))}
+              <TypewriterText
+                text="LET'S BUILD THE"
+                delay={300}
+                speed={70}
+                onComplete={() => setLine1Done(true)}
+              />
             </span>
-            <span className="line gradient">
-              {line2.split('').map((char, i) => (
-                <span
-                  key={i}
-                  className={`char-animate gradient-char ${i < visibleChars.line2 ? 'visible' : ''}`}
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </span>
-              ))}
-            </span>
+            {line1Done && (
+              <span className="line gradient">
+                <TypewriterText
+                  text="FUTURE TOGETHER"
+                  delay={100}
+                  speed={70}
+                />
+              </span>
+            )}
           </h1>
           <p className="contact-subtitle">
             Have questions? Want to collaborate? We'd love to hear from you!
