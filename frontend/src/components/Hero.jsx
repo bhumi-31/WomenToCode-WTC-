@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import './Hero.css'
 
 function Hero() {
@@ -12,11 +13,11 @@ function Hero() {
     <section id="home" className="hero">
       {/* Video Background */}
       <div className="hero-bg-container">
-        <video 
+        <video
           className="hero-bg-video"
-          autoPlay 
-          muted 
-          loop 
+          autoPlay
+          muted
+          loop
           playsInline
           src="/hero-bg.mp4"
         />
@@ -32,13 +33,13 @@ function Hero() {
         </h1>
 
         <div className="hero-subtitle">
-          <p>Empowering women in tech through<br/>community, education, and opportunity.</p>
+          <p>Empowering women in tech through<br />community, education, and opportunity.</p>
         </div>
 
-        <a href="#join" className="hero-btn">
+        <Link to="/join" className="hero-btn">
           <span className="btn-icon">✦</span>
           <span className="btn-text">JOIN US NOW</span>
-        </a>
+        </Link>
       </div>
 
       {/* Right Side Description - Kinetics Style */}

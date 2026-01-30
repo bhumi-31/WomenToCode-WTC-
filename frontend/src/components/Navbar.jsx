@@ -14,7 +14,7 @@ function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50)
     }
-    
+
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -51,9 +51,7 @@ function Navbar() {
             <button onClick={handleJoinClick} className="nav-register-btn">
               <span>✦</span> JOIN NOW
             </button>
-            <Link to="/login" className="nav-login-btn">
-              LOGIN
-            </Link>
+            {/* LOGIN button hidden for now */}
           </>
         ) : (
           <div className="nav-user-section">
@@ -63,7 +61,7 @@ function Navbar() {
             </button>
           </div>
         )}
-        
+
         <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
           {isHomePage ? (
             <>
@@ -81,9 +79,9 @@ function Navbar() {
           <Link to="/contact" onClick={() => setMenuOpen(false)}>CONTACT</Link>
         </div>
 
-        <button 
-          className={`menu-toggle ${menuOpen ? 'active' : ''}`} 
-          onClick={() => setMenuOpen(!menuOpen)} 
+        <button
+          className={`menu-toggle ${menuOpen ? 'active' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
           <span></span>
