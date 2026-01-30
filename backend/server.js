@@ -5,7 +5,7 @@ require('dotenv').config();
 
 // Import our custom modules
 const connectDB = require('./config/db');
-const passport = require('./config/passport');  
+const passport = require('./config/passport');
 const authRoutes = require('./routes/authRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const projectRoutes = require('./routes/projectRoutes');
@@ -20,14 +20,18 @@ const app = express();
 
 app.use(cors({
   origin: [
+    'https://womentocode.me',
+    'https://www.womentocode.me',
     'https://womentocode-wtc.vercel.app',
-    'https://womentocode-wtc.onrender.com'
+    'https://womentocode-wtc.onrender.com',
+    'http://localhost:5173',
+    'http://localhost:5183'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
-app.use(express.json({ limit: '50mb' }));   
-app.use(express.urlencoded({ limit: '50mb', extended: true }));  
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 
 app.use(passport.initialize());
