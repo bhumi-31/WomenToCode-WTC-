@@ -253,7 +253,7 @@ function Team() {
             </h1>
             {titleAnimationComplete && (
               <p className="team-description fade-in">
-                Loading team members...
+                Gathering our amazing team... ✨
               </p>
             )}
           </div>
