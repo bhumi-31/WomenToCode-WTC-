@@ -563,27 +563,40 @@ function AdminMembership() {
           font-size: 0.9rem;
         }
 
-        .modal-body .form-group {
+        .reply-modal .form-group {
           margin-bottom: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
         }
 
-        .modal-body label {
+        .reply-modal .form-group label {
           display: block;
           color: #F7D046;
-          margin-bottom: 8px;
-          font-weight: 500;
+          margin-bottom: 10px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          letter-spacing: 0.5px;
+          position: relative;
+          top: 0;
+          left: 0;
+          transform: none;
+          pointer-events: auto;
+          background: transparent;
+          padding: 0;
         }
 
-        .modal-body input,
-        .modal-body textarea {
+        .reply-modal .form-group input,
+        .reply-modal .form-group textarea {
           width: 100%;
-          padding: 12px 16px;
+          padding: 14px 16px;
           background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 10px;
           color: #fff;
           font-size: 0.95rem;
           font-family: inherit;
+          box-sizing: border-box;
         }
 
         .modal-body input:focus,
