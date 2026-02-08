@@ -1,5 +1,6 @@
 const Membership = require('../models/Membership');
 const { sendMembershipReply } = require('../utils/emailService');
+const { appendMembershipToSheet } = require('../utils/googleSheetsService');
 
 // @desc    Submit membership application
 // @route   POST /membership
@@ -27,6 +28,11 @@ exports.submitApplication = async (req, res) => {
       email,
       domain,
       whyJoin
+    });
+
+    // Sync to Google Sheets (async, don't block response)
+    appendMembershipToSheet(application).catch(err => {
+      console.error('Google Sheets sync error:', err);
     });
 
     res.status(201).json({
